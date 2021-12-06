@@ -3,6 +3,9 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+
 /* Debug Function for callbacks*/
 void GLAPIENTRY
 MessageCallback(GLenum source,
@@ -127,16 +130,10 @@ int main(void)
 
     /* Buffer Creation */
 
-    GLuint buffer;
+    VertexBuffer vb(position, 4 * 2 * sizeof(GLfloat));
+    IndexBuffer ib(indices, 6);
 
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(GLfloat), position, GL_STATIC_DRAW);
-
-    GLuint ibo;
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), indices, GL_STATIC_DRAW);
+    ib.Bind();
 
 
     /* Initializing VAOs*/
