@@ -1,0 +1,124 @@
+\hypertarget{group__vulkan}{}\doxysection{Vulkan support reference}
+\label{group__vulkan}\index{Vulkan support reference@{Vulkan support reference}}
+
+
+Functions and types related to Vulkan.  
+
+
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef void($\ast$ \mbox{\hyperlink{group__vulkan_ga70c01918dc9d233a4fbe0681a43018af}{GLFWvkproc}}) (void)
+\begin{DoxyCompactList}\small\item\em Vulkan API function pointer type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{glfw3_8h_a56da5036b2cc259351ae22fd6439bb47}{GLFWAPI}} int \mbox{\hyperlink{group__vulkan_ga72e7c3757d9ff2333181a5569bb7c403}{glfw\+Vulkan\+Supported}} (void)
+\begin{DoxyCompactList}\small\item\em Returns whether the Vulkan loader and an ICD have been found. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{glfw3_8h_a56da5036b2cc259351ae22fd6439bb47}{GLFWAPI}} const char $\ast$$\ast$ \mbox{\hyperlink{group__vulkan_gada152edc5bbbd0c2138728878632fd9c}{glfw\+Get\+Required\+Instance\+Extensions}} (uint32\+\_\+t $\ast$count)
+\begin{DoxyCompactList}\small\item\em Returns the Vulkan instance extensions required by GLFW. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Functions and types related to Vulkan. 
+
+This is the reference documentation for Vulkan related functions and types. For more task-\/oriented information, see the vulkan\+\_\+guide. 
+
+\doxysubsection{Typedef Documentation}
+\mbox{\Hypertarget{group__vulkan_ga70c01918dc9d233a4fbe0681a43018af}\label{group__vulkan_ga70c01918dc9d233a4fbe0681a43018af}} 
+\index{Vulkan support reference@{Vulkan support reference}!GLFWvkproc@{GLFWvkproc}}
+\index{GLFWvkproc@{GLFWvkproc}!Vulkan support reference@{Vulkan support reference}}
+\doxysubsubsection{\texorpdfstring{GLFWvkproc}{GLFWvkproc}}
+{\footnotesize\ttfamily typedef void($\ast$ GLFWvkproc) (void)}
+
+
+
+Vulkan API function pointer type. 
+
+Generic function pointer used for returning Vulkan API function pointers without forcing a cast from a regular pointer.
+
+\begin{DoxySeeAlso}{See also}
+vulkan\+\_\+proc 
+
+glfw\+Get\+Instance\+Proc\+Address
+\end{DoxySeeAlso}
+\begin{DoxySince}{Since}
+Added in version 3.\+2. 
+\end{DoxySince}
+
+
+Definition at line \mbox{\hyperlink{glfw3_8h_source_l01162}{1162}} of file \mbox{\hyperlink{glfw3_8h_source}{glfw3.\+h}}.
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{group__vulkan_gada152edc5bbbd0c2138728878632fd9c}\label{group__vulkan_gada152edc5bbbd0c2138728878632fd9c}} 
+\index{Vulkan support reference@{Vulkan support reference}!glfwGetRequiredInstanceExtensions@{glfwGetRequiredInstanceExtensions}}
+\index{glfwGetRequiredInstanceExtensions@{glfwGetRequiredInstanceExtensions}!Vulkan support reference@{Vulkan support reference}}
+\doxysubsubsection{\texorpdfstring{glfwGetRequiredInstanceExtensions()}{glfwGetRequiredInstanceExtensions()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{glfw3_8h_a56da5036b2cc259351ae22fd6439bb47}{GLFWAPI}} const char $\ast$$\ast$ glfw\+Get\+Required\+Instance\+Extensions (\begin{DoxyParamCaption}\item[{uint32\+\_\+t $\ast$}]{count }\end{DoxyParamCaption})}
+
+
+
+Returns the Vulkan instance extensions required by GLFW. 
+
+This function returns an array of names of Vulkan instance extensions required by GLFW for creating Vulkan surfaces for GLFW windows. If successful, the list will always contain {\ttfamily VK\+\_\+\+KHR\+\_\+surface}, so if you don\textquotesingle{}t require any additional extensions you can pass this list directly to the {\ttfamily Vk\+Instance\+Create\+Info} struct.
+
+If Vulkan is not available on the machine, this function returns {\ttfamily NULL} and generates a \mbox{\hyperlink{group__errors_ga56882b290db23261cc6c053c40c2d08e}{GLFW\+\_\+\+API\+\_\+\+UNAVAILABLE}} error. Call \mbox{\hyperlink{group__vulkan_ga72e7c3757d9ff2333181a5569bb7c403}{glfw\+Vulkan\+Supported}} to check whether Vulkan is at least minimally available.
+
+If Vulkan is available but no set of extensions allowing window surface creation was found, this function returns {\ttfamily NULL}. You may still use Vulkan for off-\/screen rendering and compute work.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ out}}  & {\em count} & Where to store the number of extensions in the returned array. This is set to zero if an error occurred. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An array of ASCII encoded extension names, or {\ttfamily NULL} if an error occurred.
+\end{DoxyReturn}
+@errors Possible errors include \mbox{\hyperlink{group__errors_ga2374ee02c177f12e1fa76ff3ed15e14a}{GLFW\+\_\+\+NOT\+\_\+\+INITIALIZED}} and \mbox{\hyperlink{group__errors_ga56882b290db23261cc6c053c40c2d08e}{GLFW\+\_\+\+API\+\_\+\+UNAVAILABLE}}.
+
+\begin{DoxyRemark}{Remarks}
+Additional extensions may be required by future versions of GLFW. You should check if any extensions you wish to enable are already in the returned array, as it is an error to specify an extension more than once in the {\ttfamily Vk\+Instance\+Create\+Info} struct.
+
+@macos GLFW currently supports both the {\ttfamily VK\+\_\+\+MVK\+\_\+macos\+\_\+surface} and the newer {\ttfamily VK\+\_\+\+EXT\+\_\+metal\+\_\+surface} extensions.
+\end{DoxyRemark}
+@pointer\+\_\+lifetime The returned array is allocated and freed by GLFW. You should not free it yourself. It is guaranteed to be valid only until the library is terminated.
+
+@thread\+\_\+safety This function may be called from any thread.
+
+\begin{DoxySeeAlso}{See also}
+vulkan\+\_\+ext 
+
+glfw\+Create\+Window\+Surface
+\end{DoxySeeAlso}
+\begin{DoxySince}{Since}
+Added in version 3.\+2. 
+\end{DoxySince}
+\mbox{\Hypertarget{group__vulkan_ga72e7c3757d9ff2333181a5569bb7c403}\label{group__vulkan_ga72e7c3757d9ff2333181a5569bb7c403}} 
+\index{Vulkan support reference@{Vulkan support reference}!glfwVulkanSupported@{glfwVulkanSupported}}
+\index{glfwVulkanSupported@{glfwVulkanSupported}!Vulkan support reference@{Vulkan support reference}}
+\doxysubsubsection{\texorpdfstring{glfwVulkanSupported()}{glfwVulkanSupported()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{glfw3_8h_a56da5036b2cc259351ae22fd6439bb47}{GLFWAPI}} int glfw\+Vulkan\+Supported (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Returns whether the Vulkan loader and an ICD have been found. 
+
+This function returns whether the Vulkan loader and any minimally functional ICD have been found.
+
+The availability of a Vulkan loader and even an ICD does not by itself guarantee that surface creation or even instance creation is possible. Call \mbox{\hyperlink{group__vulkan_gada152edc5bbbd0c2138728878632fd9c}{glfw\+Get\+Required\+Instance\+Extensions}} to check whether the extensions necessary for Vulkan surface creation are available and glfw\+Get\+Physical\+Device\+Presentation\+Support to check whether a queue family of a physical device supports image presentation.
+
+\begin{DoxyReturn}{Returns}
+{\ttfamily GLFW\+\_\+\+TRUE} if Vulkan is minimally available, or {\ttfamily GLFW\+\_\+\+FALSE} otherwise.
+\end{DoxyReturn}
+@errors Possible errors include \mbox{\hyperlink{group__errors_ga2374ee02c177f12e1fa76ff3ed15e14a}{GLFW\+\_\+\+NOT\+\_\+\+INITIALIZED}}.
+
+@thread\+\_\+safety This function may be called from any thread.
+
+\begin{DoxySeeAlso}{See also}
+vulkan\+\_\+support
+\end{DoxySeeAlso}
+\begin{DoxySince}{Since}
+Added in version 3.\+2. 
+\end{DoxySince}

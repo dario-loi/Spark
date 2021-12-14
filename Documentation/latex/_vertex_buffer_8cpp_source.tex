@@ -1,0 +1,31 @@
+\hypertarget{_vertex_buffer_8cpp_source}{}\doxysection{Vertex\+Buffer.\+cpp}
+\label{_vertex_buffer_8cpp_source}\index{OpenGL/src/VertexBuffer.cpp@{OpenGL/src/VertexBuffer.cpp}}
+\mbox{\hyperlink{_vertex_buffer_8cpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00001}00001 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{_vertex_buffer_8h}{VertexBuffer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00002}00002 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{renderer_8h}{renderer.h}}"{}}}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00003}\mbox{\hyperlink{class_vertex_buffer_af8adb744d388d978af68035cf8254425}{00003}} \mbox{\hyperlink{class_vertex_buffer_af8adb744d388d978af68035cf8254425}{VertexBuffer::VertexBuffer}}(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* data, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} size)}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00004}00004 \{}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00005}00005 }
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00006}00006     glGenBuffers(1, \&m\_RenderID);}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00007}00007     glBindBuffer(GL\_ARRAY\_BUFFER, m\_RenderID);}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00008}00008     glBufferData(GL\_ARRAY\_BUFFER, size, data, GL\_STATIC\_DRAW);}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00009}00009 }
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00010}00010 \}}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00011}00011 }
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00012}\mbox{\hyperlink{class_vertex_buffer_a5216726fdd43b2ae8e1439e347717fdd}{00012}} \mbox{\hyperlink{class_vertex_buffer_a5216726fdd43b2ae8e1439e347717fdd}{VertexBuffer::\string~VertexBuffer}}()}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00013}00013 \{}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00014}00014     glDeleteBuffers(1, \&m\_RenderID);}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00015}00015 \}}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00016}00016 }
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00017}\mbox{\hyperlink{class_vertex_buffer_a13019e8580ca3e369fad4166500ad2b9}{00017}} \textcolor{keywordtype}{void} \mbox{\hyperlink{class_vertex_buffer_a13019e8580ca3e369fad4166500ad2b9}{VertexBuffer::Bind}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00018}00018 \textcolor{keyword}{}\{}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00019}00019     glBindBuffer(GL\_ARRAY\_BUFFER, m\_RenderID);}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00020}00020 \}}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00021}00021 }
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00022}\mbox{\hyperlink{class_vertex_buffer_abfdb36238d60f2cd7bf63093f914b61f}{00022}} \textcolor{keywordtype}{void} \mbox{\hyperlink{class_vertex_buffer_abfdb36238d60f2cd7bf63093f914b61f}{VertexBuffer::Unbind}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00023}00023 \textcolor{keyword}{}\{}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00024}00024     glBindBuffer(GL\_ARRAY\_BUFFER, 0);}
+\DoxyCodeLine{\Hypertarget{_vertex_buffer_8cpp_source_l00025}00025 \}}
+
+\end{DoxyCode}

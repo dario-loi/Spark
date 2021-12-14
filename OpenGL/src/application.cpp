@@ -3,10 +3,15 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
+#include "GLData/VertexBuffer.h"
+#include "GLData/IndexBuffer.h"
+#include "GLData/VertexArray.h"
 
-/* Debug Function for callbacks*/
+/**
+*  \brief Callback function that defines debug behaviour. $\sum_0^\infty x$
+*
+*  \return void
+*/
 void GLAPIENTRY
 MessageCallback(GLenum source,
     GLenum type,
@@ -112,38 +117,49 @@ int main(void)
     glDebugMessageCallback(MessageCallback, 0);
 
     /* Vertex Data*/
+    {
+        float position[21] = {
+            0.0f,  0.0f,  0.0f,
+            0.5f,  0.0f,  0.0f,
+            0.5f,  0.5f,  0.0f,
+            0.0f,  0.5f,  0.0f,
+           -0.15f,  0.75f, -0.25f,
+           -0.15f,  0.25f, -0.25f,
+            0.35f,  0.75f, -0.25f,
+        };
 
-    float position[12] = {
-       -0.5f, -0.5f,
-        0.2f,  0.6f,
-        0.4f, -0.5f,
+        GLuint indices[18] = {
 
-       -0.5f,  0.3f,
-    };
+            2,0,1,
+            2,3,0,
+            0,3,5,
+            3,4,5,
+            3,4,6,
+            3,2,6
 
-    GLuint indices[6] = {
+        };
 
-        0,1,2,
-        0,1,3
+        /* Buffer Creation */
+           
+        unsigned int vao;
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
 
-    };
+        VertexArray va;
 
-    /* Buffer Creation */
+        VertexBuffer vb(position, 7 * 3 * sizeof(GLfloat));
 
-    VertexBuffer vb(position, 4 * 2 * sizeof(GLfloat));
-    IndexBuffer ib(indices, 6);
+        VertexBufferLayout layout;
+        layout.Push<float>(3);
 
-    ib.Bind();
+        va.AddBuffer(vb, layout);
+        IndexBuffer ib(indices, 18);
 
+        ib.Bind();
 
-    /* Initializing VAOs*/
+        /*Creating Shaders*/
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-    glEnableVertexAttribArray(0);
-
-    /*Creating Shaders*/
-
-    std::string vertexShader = R"(
+        std::string vertexShader = R"(
         #version 330 core
         
         layout(location = 0) in vec4 position;
@@ -156,86 +172,58 @@ int main(void)
         }
     )";
 
-    std::string fragmentShader = R"(
+        std::string fragmentShader = R"(
         #version 330 core
         
         layout(location = 0) out vec4 color;
 
         uniform vec4 u_Color;
-        uniform int u_Width;
-        uniform int u_Height;
         
         void main()
         {
-            float y = u_Height - gl_FragCoord.y;
-            
-            float grad_x = gl_FragCoord.x / u_Width;
-            float grad_y = y / u_Height;
-            float grad_z = (gl_FragCoord.x * y) / (u_Height * u_Width);
 
-            vec4 fin_Color = vec4( u_Color.x * grad_x, u_Color.y * grad_y, u_Color.z * grad_z , 1.0f);
-
-            color = fin_Color;
+            color = u_Color;
             
         }
     )";
 
-    GLuint shader = CreateShader(vertexShader, fragmentShader);
+        GLuint shader = CreateShader(vertexShader, fragmentShader);
 
-    glUseProgram(shader);
+        glUseProgram(shader);
 
-    /* Get window metadata*/
-    
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* vidAttr = glfwGetVideoMode(monitor);
+        /* Get window metadata*/
 
-    std::cout << " width is " << vidAttr->width << " height is " << vidAttr->height << std::endl;
+        //GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        //const GLFWvidmode* vidAttr = glfwGetVideoMode(monitor);
 
-    //locate uniform addresses
+        //std::cout << " width is " << vidAttr->width << " height is " << vidAttr->height << std::endl;
 
-    GLint c_Addr = glGetUniformLocation(shader, "u_Color");
-    glUniform4f(c_Addr, 1.0f, 1.0f, 1.0f, 1.0f);
+        //locate uniform addresses
 
-    GLint w_Addr = glGetUniformLocation(shader, "u_Width");
-    glUniform1i(w_Addr, vidAttr->width);
+        GLint c_Addr = glGetUniformLocation(shader, "u_Color");
+        glUniform4f(c_Addr, 1.0f, 0.0f, 0.0f, 1.0f);
 
-    GLint h_Addr = glGetUniformLocation(shader, "u_Height");
-    glUniform1i(h_Addr, vidAttr->height);
+        /* Loop until the user closes the window */
+        while (!glfwWindowShouldClose(window))
+        {
 
-    GLfloat r = 0.0f;
-    GLfloat increment = 0.01f;
-    GLfloat scaling = 0.0f;
-    GLfloat scalingInv = 0.0f;
- 
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
 
-        
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+            /* Render here */
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        glUniform4f(c_Addr, scaling, scalingInv, scaling, 1.0f);
-        
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+            glUniform4f(c_Addr, 1.0f, 0.0f, 0.0f, 1.0f);
 
-        if (scaling > 1.0f)
-            increment = -0.05f;
-        else if (scaling < 0.0f)
-            increment = 0.05f;
+            glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, nullptr);
 
-        scaling += increment;
 
-        scalingInv = 1.0f - scaling;
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+            /* Poll for and process events */
+            glfwPollEvents();
 
-        /* Poll for and process events */
-        glfwPollEvents();
-
+        }
     }
-
     glfwTerminate();
     return 0;
 }
