@@ -2,7 +2,6 @@
 
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
-#include "../Renderer.h"
 
 class VertexArray
 {

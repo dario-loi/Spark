@@ -145,23 +145,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="res\vendor\stb_image.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\GLData\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\GLData\VertexBuffer.cpp" />
     <ClCompile Include="src\GLData\VertexArray.cpp" />
-    <ClCompile Include="src\GLData\VertexBufferLayout.cpp" />
+    <ClCompile Include="src\GLData\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="res\vendor\stb_image.h" />
+    <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\GLData\IndexBuffer.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\GLData\VertexBuffer.h" />
     <ClInclude Include="src\GLData\VertexArray.h" />
     <ClInclude Include="src\GLData\VertexBufferLayout.h" />
+    <ClInclude Include="src\GLData\Texture.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
     <None Include="Doxyfile" />
+    <None Include="res\shaders\Basic.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\Grass.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

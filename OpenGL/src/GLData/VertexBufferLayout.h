@@ -26,7 +26,7 @@ class VertexBufferLayout
 {
 private:
 	std::vector<VertexBufferElement> m_Elements;
-	unsigned int m_Stride;
+	unsigned int m_Stride = 0;
 public:
 
 	VertexBufferLayout()

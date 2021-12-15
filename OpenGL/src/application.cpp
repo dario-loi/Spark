@@ -6,6 +6,9 @@
 #include "GLData/VertexBuffer.h"
 #include "GLData/IndexBuffer.h"
 #include "GLData/VertexArray.h"
+#include "Shader.h"
+#include "Renderer.h"
+#include "GLData/Texture.h"
 
 /**
 *  \brief Callback function that defines debug behaviour. $\sum_0^\infty x$
@@ -26,61 +29,6 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
-static GLuint 
-CompileShader(GLuint type, 
-    const std::string& source) 
-{
-    GLuint id = glCreateShader(type);
-    const char* src = source.c_str();
-
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
-
-    int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-
-    if (result == GL_FALSE)
-    {
-        int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-
-        char* message = (char*)_malloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, message);
-        std::cout << "failed to compile " <<
-            (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
-            << "shader!" << std::endl;
-
-        std::cout << message << std::endl;
-        glDeleteShader(id);
-        return 0;
-    }
-        
-    return id;
-}
-
-static GLuint 
-CreateShader(const std::string& vertexShader, 
-    const std::string& fragmentShader)
-{
-    GLuint program = glCreateProgram();
-    GLuint vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-
-    glLinkProgram(program);
-
-    glValidateProgram(program);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-
-    glDetachShader(program, vs);
-    glDetachShader(program, fs);
-
-    return program;
-}
 
 int main(void)
 {
@@ -118,24 +66,18 @@ int main(void)
 
     /* Vertex Data*/
     {
-        float position[21] = {
-            0.0f,  0.0f,  0.0f,
-            0.5f,  0.0f,  0.0f,
-            0.5f,  0.5f,  0.0f,
-            0.0f,  0.5f,  0.0f,
-           -0.15f,  0.75f, -0.25f,
-           -0.15f,  0.25f, -0.25f,
-            0.35f,  0.75f, -0.25f,
+        float position[] = {
+            -0.5f, -0.5f, 0.0f, 0.0f, //0
+             0.5f, -0.5f, 1.0f, 0.0f, //1
+             0.5f,  0.5f, 1.0f, 1.0f, //2
+            -0.5f,  0.5f, 0.0f, 1.0f   //3
+
         };
 
-        GLuint indices[18] = {
+        GLuint indices[] = {
 
-            2,0,1,
-            2,3,0,
-            0,3,5,
-            3,4,5,
-            3,4,6,
-            3,2,6
+            0,1,2,
+            2,3,0
 
         };
 
@@ -147,49 +89,23 @@ int main(void)
 
         VertexArray va;
 
-        VertexBuffer vb(position, 7 * 3 * sizeof(GLfloat));
+        VertexBuffer vb(position, 4 * 4 * sizeof(GLfloat));
 
         VertexBufferLayout layout;
-        layout.Push<float>(3);
+        layout.Push<float>(2);
+        layout.Push<float>(2);
 
         va.AddBuffer(vb, layout);
-        IndexBuffer ib(indices, 18);
 
-        ib.Bind();
+        IndexBuffer ib(indices, 6);
 
-        /*Creating Shaders*/
-
-        std::string vertexShader = R"(
-        #version 330 core
+        Shader shader("res/shaders/Basic.shader");
+        shader.Bind();
+        shader.SetUniform4f("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
         
-        layout(location = 0) in vec4 position;
-        
-        void main()
-        {
-            
-            gl_Position = position;
-            
-        }
-    )";
-
-        std::string fragmentShader = R"(
-        #version 330 core
-        
-        layout(location = 0) out vec4 color;
-
-        uniform vec4 u_Color;
-        
-        void main()
-        {
-
-            color = u_Color;
-            
-        }
-    )";
-
-        GLuint shader = CreateShader(vertexShader, fragmentShader);
-
-        glUseProgram(shader);
+        Texture texture("res/textures/Grass.png");
+        texture.Bind();
+        shader.SetUniform1i("u_Texture", 0);
 
         /* Get window metadata*/
 
@@ -200,8 +116,7 @@ int main(void)
 
         //locate uniform addresses
 
-        GLint c_Addr = glGetUniformLocation(shader, "u_Color");
-        glUniform4f(c_Addr, 1.0f, 0.0f, 0.0f, 1.0f);
+        Renderer renderer;
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
@@ -209,12 +124,12 @@ int main(void)
 
 
             /* Render here */
-            glClear(GL_COLOR_BUFFER_BIT);
+            renderer.Clear();
 
-            glUniform4f(c_Addr, 1.0f, 0.0f, 0.0f, 1.0f);
+            shader.SetUniform4f("u_Color", 0.0f, 1.0f, 0.0f, 1.0f);
+            shader.SetUniform1f("u_Blend", (float) cos(glfwGetTime()));
 
-            glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, nullptr);
-
+            renderer.Draw(va, ib, shader);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
