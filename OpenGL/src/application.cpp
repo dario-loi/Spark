@@ -11,7 +11,7 @@
 #include "GLData/Texture.h"
 
 /**
-*  \brief Callback function that defines debug behaviour. $\sum_0^\infty x$
+*  \brief Callback function that defines debug behaviour. 
 *
 *  \return void
 */
@@ -68,10 +68,9 @@ int main(void)
     {
         float position[] = {
             -0.5f, -0.5f, 0.0f, 0.0f, //0
-             0.5f, -0.5f, 1.0f, 0.0f, //1
+             0.4f, -0.4f, 1.0f, 0.0f, //1
              0.5f,  0.5f, 1.0f, 1.0f, //2
-            -0.5f,  0.5f, 0.0f, 1.0f   //3
-
+            -0.4f,  0.4f, 0.0f, 1.0f  //3
         };
 
         GLuint indices[] = {
@@ -88,7 +87,6 @@ int main(void)
         glBindVertexArray(vao);
 
         VertexArray va;
-
         VertexBuffer vb(position, 4 * 4 * sizeof(GLfloat));
 
         VertexBufferLayout layout;
@@ -100,7 +98,7 @@ int main(void)
         IndexBuffer ib(indices, 6);
 
         Shader shader("res/shaders/Basic.shader");
-        shader.Bind();
+        shader.Bind(); 
         shader.SetUniform4f("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
         
         Texture texture("res/textures/Grass.png");
@@ -119,15 +117,18 @@ int main(void)
         Renderer renderer;
 
         /* Loop until the user closes the window */
+
+        float period;
+
         while (!glfwWindowShouldClose(window))
         {
 
-
+            period = (float) abs(cos(glfwGetTime()));
             /* Render here */
             renderer.Clear();
 
             shader.SetUniform4f("u_Color", 0.0f, 1.0f, 0.0f, 1.0f);
-            shader.SetUniform1f("u_Blend", (float) cos(glfwGetTime()));
+            shader.SetUniform1f("u_Blend", period);
 
             renderer.Draw(va, ib, shader);
 
@@ -136,7 +137,7 @@ int main(void)
 
             /* Poll for and process events */
             glfwPollEvents();
-
+            
         }
     }
     glfwTerminate();

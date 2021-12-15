@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include <iostream>
 #include "../../res/vendor/stb_image.h"
+#include <cassert>
 
 Texture::Texture(const std::string& path)
 	: m_RendererID(0), m_FilePath(path), m_LocalBuffer(nullptr), m_Width(0), m_Height(0), m_BPP(0)
@@ -40,6 +41,7 @@ void Texture::Bind(unsigned int slot) const
 	}
 	else
 	{
+		assert(true);
 		std::cerr << "Currently selected texture slot (" << slot << ") is unavailable in " <<
 			"the current platform, overwriting slot (0)" << std::endl;
 		glActiveTexture(GL_TEXTURE0);
