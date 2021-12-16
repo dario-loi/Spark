@@ -145,24 +145,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\GLData\Buffers\EBO.cpp" />
     <ClCompile Include="res\vendor\stb_image.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\application.cpp" />
-    <ClCompile Include="src\GLData\IndexBuffer.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\GLData\VertexBuffer.cpp" />
-    <ClCompile Include="src\GLData\VertexArray.cpp" />
-    <ClCompile Include="src\GLData\Texture.cpp" />
+    <ClCompile Include="src\GLData\Buffers\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GLData\Buffers\EBO.h" />
     <ClInclude Include="res\vendor\stb_image.h" />
     <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\GLData\IndexBuffer.h" />
-    <ClInclude Include="src\Renderer.h" />
-    <ClInclude Include="src\GLData\VertexBuffer.h" />
-    <ClInclude Include="src\GLData\VertexArray.h" />
-    <ClInclude Include="src\GLData\VertexBufferLayout.h" />
-    <ClInclude Include="src\GLData\Texture.h" />
+    <ClInclude Include="src\GLData\Buffers\VBO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile" />

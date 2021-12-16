@@ -1,4 +1,2 @@
-﻿  Texture.cpp
-C:\dev\OpenGL\OpenGL-tutorial\OpenGL\src\GLData\Texture.cpp(43,3): error C3861: 'assert': identifier not found
-  application.cpp
-  Generating Code...
+﻿  application.cpp
+  OpenGL.vcxproj -> D:\Code\Cpp\GL\OpenGL-tutorial\Debug\OpenGL.exe

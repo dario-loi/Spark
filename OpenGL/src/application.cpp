@@ -3,13 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
-#include "GLData/VertexBuffer.h"
-#include "GLData/IndexBuffer.h"
-#include "GLData/VertexArray.h"
 #include "Shader.h"
-#include "Renderer.h"
-#include "GLData/Texture.h"
-
 /**
 *  \brief Callback function that defines debug behaviour. 
 *
@@ -37,6 +31,8 @@ int main(void)
     /* Initialize the library */
     if (!glfwInit())
         return -1;
+
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(1280, 960, "Hello World", NULL, NULL);
@@ -66,44 +62,51 @@ int main(void)
 
     /* Vertex Data*/
     {
-        float position[] = {
-            -0.5f, -0.5f, 0.0f, 0.0f, //0
-             0.4f, -0.4f, 1.0f, 0.0f, //1
-             0.5f,  0.5f, 1.0f, 1.0f, //2
-            -0.4f,  0.4f, 0.0f, 1.0f  //3
+        float vert[] = {
+            0.5f, 0.0f,
+            0.0f, 0.5f,
+           -0.5f, 0.0f
         };
 
-        GLuint indices[] = {
+        GLuint indx[] = {
 
-            0,1,2,
-            2,3,0
+            0,1,2
 
         };
 
         /* Buffer Creation */
            
-        unsigned int vao;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        //Initializing VBO and VAO
+        
+        //VBO Generation
+        GLuint VBO, VAO, EBO;
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-        VertexArray va;
-        VertexBuffer vb(position, 4 * 4 * sizeof(GLfloat));
+        //EBO Generation
+        glGenBuffers(1, &EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(unsigned int), vert, GL_STATIC_DRAW);
 
-        VertexBufferLayout layout;
-        layout.Push<float>(2);
-        layout.Push<float>(2);
+        //VAO Generation
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+        glBufferData(GL_ARRAY_BUFFER, 3 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
 
-        va.AddBuffer(vb, layout);
+        //VBO Layout Definition
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+        
 
-        IndexBuffer ib(indices, 6);
+        //Unbinding VAOs
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
 
         Shader shader("res/shaders/Basic.shader");
-        shader.Bind(); 
-        shader.SetUniform4f("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
-        
-        Texture texture("res/textures/Grass.png");
-        texture.Bind();
-        shader.SetUniform1i("u_Texture", 0);
+        shader.Bind();
+
+        std::cerr << "Got here! " << std::endl;
 
         /* Get window metadata*/
 
@@ -114,25 +117,21 @@ int main(void)
 
         //locate uniform addresses
 
-        Renderer renderer;
 
         /* Loop until the user closes the window */
-
-        float period;
 
         while (!glfwWindowShouldClose(window))
         {
 
-            period = (float) abs(cos(glfwGetTime()));
+            glClear(GL_COLOR_BUFFER_BIT);
             /* Render here */
-            renderer.Clear();
 
-            shader.SetUniform4f("u_Color", 0.0f, 1.0f, 0.0f, 1.0f);
-            shader.SetUniform1f("u_Blend", period);
+            glBindVertexArray(VAO);
 
-            renderer.Draw(va, ib, shader);
-
+            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indx);
+            glBindVertexArray(0);
             /* Swap front and back buffers */
+
             glfwSwapBuffers(window);
 
             /* Poll for and process events */
