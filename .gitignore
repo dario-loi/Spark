@@ -253,3 +253,7 @@ paket-files/
 *.ipch
 .vs/OpenGL/v17/ipch/AutoPCH/4fcd0de06c815091/VERTEXBUFFERLAYOUT.ipch
 *.ipch
+*.pdb
+*.ipch
+*.ipch
+*.db
