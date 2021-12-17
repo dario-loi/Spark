@@ -73,11 +73,11 @@ int main(void)
     {
         unsigned int n_verts = 12;
         float* vert = new float[n_verts]{
-            0.5f, 0.0f, 0.0f,
-            0.5f, 0.5f, 0.0f,
-           -0.5f, 0.0f, 0.0f,
+            0.1f, 0.0f, 0.0f,
+            0.1f, 0.1f, 0.0f,
+           -0.1f, 0.0f, 0.0f,
 
-           -0.5f, 0.5f, 0.0f
+           -0.1f, 0.1f, 0.0f
         };
 
         unsigned int n_indxs = 6;
@@ -106,8 +106,25 @@ int main(void)
 
 
         std::vector<Instance> instances;
-        instances.push_back(Instance(&triangle));
-        instances.push_back(Instance(&triangle, glm::vec3(0.7f, 0.6f, 0.0f)));
+        
+        float offset = 0.25f;
+        for (int y = -2; y < 2; y += 2)
+        {
+            for (int x = -2; x < 2; x += 2)
+            {
+                glm::vec3 translation;
+                translation.x = (float)x / 4.0f + offset;
+                translation.y = (float)y / 4.0f + offset;
+                translation.z = 1.0f;
+                instances.push_back(Instance(&triangle, translation));
+                instances.at(instances.size() - 1).Scale(glm::vec3(1.5f, 2.0f, 2.0f));
+
+                instances.at(instances.size() - 1).Rotate(glm::vec3(0.0f, 0.0f, 90.0f * abs(x) ) );
+
+            }
+        }
+        
+
 
         /*
             Init Shader
@@ -130,10 +147,8 @@ int main(void)
 
         unsigned int* indices = triangle.getIndexReference();
         
-
         float lastFrame = 0.0f;
         float thisFrame;
-
 
         while (!glfwWindowShouldClose(window))
         {
@@ -148,6 +163,7 @@ int main(void)
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
 
                 glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
+
             }
 
 
@@ -159,6 +175,7 @@ int main(void)
             /* Poll for and process events */
             glfwPollEvents();
             
+            std::cerr << "Frame time: " << deltaTime << std::endl;
         }
     }
     glfwTerminate();
