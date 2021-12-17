@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\GLData\Instance.cpp" />
     <ClCompile Include="src\GLData\Model.cpp" />
     <ClCompile Include="src\GLData\Buffers\EBO.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="src\GLData\Buffers\VAO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\GLData\Instance.h" />
     <ClInclude Include="src\GLData\Model.h" />
     <ClInclude Include="src\GLData\Buffers\EBO.h" />

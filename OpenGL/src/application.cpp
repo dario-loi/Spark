@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Shader.h"
+#include "Camera.h"
 
 #define LOG(x) std::cerr<<x<<std::endl;
 /**
@@ -71,21 +72,39 @@ int main(void)
 
     /* Vertex Data*/
     {
-        unsigned int n_verts = 12;
-        float* vert = new float[n_verts]{
-            0.1f, 0.0f, 0.0f,
-            0.1f, 0.1f, 0.0f,
-           -0.1f, 0.0f, 0.0f,
-
-           -0.1f, 0.1f, 0.0f
+        unsigned int n_verts = 24;
+        float* vert = new float[n_verts]
+        {
+            -0.5f, -0.5f,  0.5f,
+            -0.5f, -0.5f, -0.5f,
+            -0.5f,  0.5f,  0.5f,
+            -0.5f,  0.5f, -0.5f,
+             0.5f, -0.5f,  0.5f,
+             0.5f, -0.5f, -0.5f,
+             0.5f,  0.5f,  0.5f,
+             0.5f,  0.5f, -0.5f
         };
 
-        unsigned int n_indxs = 6;
-        GLuint* indx = new GLuint[n_indxs]{
+        unsigned int n_indxs = 36;
+        GLuint* indx = new GLuint[n_indxs]
+        {
+                0, 1, 2, // -x
+                1, 3, 2,
 
-            2,0,1,
-            2,1,3
+                4, 6, 5, // +x
+                6, 7, 5,
 
+                0, 5, 1, // -y
+                5, 6, 1,
+
+                2, 6, 3, // +y
+                6, 7, 3,
+
+                0, 4, 2, // +z
+                4, 6, 2,
+
+                1, 7, 3, // -z
+                5, 7, 1
         };
 
         /*
@@ -117,7 +136,6 @@ int main(void)
                 translation.y = (float)y / 4.0f + offset;
                 translation.z = 1.0f;
                 instances.push_back(Instance(&triangle, translation));
-                instances.at(instances.size() - 1).Scale(glm::vec3(1.5f, 2.0f, 2.0f));
 
                 instances.at(instances.size() - 1).Rotate(glm::vec3(0.0f, 0.0f, 90.0f * abs(x) ) );
 
@@ -150,11 +168,18 @@ int main(void)
         float lastFrame = 0.0f;
         float thisFrame;
 
+        Camera cam(90.0f,  4 / 3);
+
+        shader.setUniform4mat("projection", cam.getProj());
+
         while (!glfwWindowShouldClose(window))
         {
             thisFrame = glfwGetTime();
             float deltaTime = thisFrame - lastFrame;
             lastFrame = thisFrame;
+
+            shader.setUniform4mat("view", cam.getView());
+            
 
             glClear(GL_COLOR_BUFFER_BIT);
             /* Render here */
@@ -163,6 +188,8 @@ int main(void)
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
 
                 glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
+
+                inst.Rotate(glm::vec3(0.0f, 0.0f, 1.0f));
 
             }
 
