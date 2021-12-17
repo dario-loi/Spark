@@ -5,11 +5,11 @@ private:
 	unsigned int RenderID;
 	unsigned int* indx;
 	unsigned int size;
-
+	bool isBound;
 
 public:
 
-	EBO(unsigned int* indices);
+	EBO(unsigned int* indices, unsigned int length);
 	~EBO();
 
 	void Bind();

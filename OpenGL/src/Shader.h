@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "GL/glew.h"
+#include "mat4x4.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -40,10 +41,10 @@ public:
 	void SetUniform1i(const std::string& name, int v0);
 	void SetUniform1f(const std::string& name, float v0);
 	void SetUniform4f(const std::string& name, float v0, float v1, float f2, float f3);
+	void setUniform4mat(const std::string& name, const glm::mat4& matrix);
 
 private:
 	int GetUniformLocation(const std::string& name);
-	bool CompileShader();
 
 };
 

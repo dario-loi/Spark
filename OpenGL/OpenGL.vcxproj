@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDIr)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDIr)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,17 +145,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\GLData\Instance.cpp" />
+    <ClCompile Include="src\GLData\Model.cpp" />
     <ClCompile Include="src\GLData\Buffers\EBO.cpp" />
     <ClCompile Include="res\vendor\stb_image.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\GLData\Buffers\VBO.cpp" />
+    <ClCompile Include="src\GLData\Buffers\VAO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\GLData\Instance.h" />
+    <ClInclude Include="src\GLData\Model.h" />
     <ClInclude Include="src\GLData\Buffers\EBO.h" />
     <ClInclude Include="res\vendor\stb_image.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\GLData\Buffers\VBO.h" />
+    <ClInclude Include="src\GLData\Buffers\VAO.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile" />

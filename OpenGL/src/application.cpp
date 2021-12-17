@@ -1,9 +1,18 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <vec3.hpp>
 #include <math.h>
 
+#include "GLData/Model.h"
+#include "GLData/Buffers/VAO.h"
+#include "GLData/Instance.h"
+
+#include <vector>
+
 #include "Shader.h"
+
+#define LOG(x) std::cerr<<x<<std::endl;
 /**
 *  \brief Callback function that defines debug behaviour. 
 *
@@ -62,51 +71,51 @@ int main(void)
 
     /* Vertex Data*/
     {
-        float vert[] = {
-            0.5f, 0.0f,
-            0.0f, 0.5f,
-           -0.5f, 0.0f
+        unsigned int n_verts = 12;
+        float* vert = new float[n_verts]{
+            0.5f, 0.0f, 0.0f,
+            0.5f, 0.5f, 0.0f,
+           -0.5f, 0.0f, 0.0f,
+
+           -0.5f, 0.5f, 0.0f
         };
 
-        GLuint indx[] = {
+        unsigned int n_indxs = 6;
+        GLuint* indx = new GLuint[n_indxs]{
 
-            0,1,2
+            2,0,1,
+            2,1,3
 
         };
 
-        /* Buffer Creation */
-           
-        //Initializing VBO and VAO
-        
-        //VBO Generation
-        GLuint VBO, VAO, EBO;
-        glGenBuffers(1, &VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-        //EBO Generation
-        glGenBuffers(1, &EBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(unsigned int), vert, GL_STATIC_DRAW);
-
-        //VAO Generation
-        glGenVertexArrays(1, &VAO);
-        glBindVertexArray(VAO);
-        glBufferData(GL_ARRAY_BUFFER, 3 * 2 * sizeof(float), vert, GL_STATIC_DRAW);
-
-        //VBO Layout Definition
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+        /*
+            Create Model
+        */
         
 
-        //Unbinding VAOs
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
 
+        Model triangle(vert, n_verts, indx, n_indxs);
+        triangle.getVAO().add_attr<float>(3);
+        triangle.ModelInit();
+
+        triangle.Bind();
+
+        /*
+            Create Instances
+        */
+
+
+        std::vector<Instance> instances;
+        instances.push_back(Instance(&triangle));
+        instances.push_back(Instance(&triangle, glm::vec3(0.6f, 0.7f, 0.0f)));
+
+
+        /*
+            Init Shader
+        */
 
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
-
-        std::cerr << "Got here! " << std::endl;
 
         /* Get window metadata*/
 
@@ -120,16 +129,20 @@ int main(void)
 
         /* Loop until the user closes the window */
 
+        unsigned int* indices = triangle.getIndexReference();
+        
+
         while (!glfwWindowShouldClose(window))
         {
 
             glClear(GL_COLOR_BUFFER_BIT);
             /* Render here */
+            for (Instance inst : instances)
+            {
+                shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
+                glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
+            }
 
-            glBindVertexArray(VAO);
-
-            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indx);
-            glBindVertexArray(0);
             /* Swap front and back buffers */
 
             glfwSwapBuffers(window);
@@ -140,5 +153,8 @@ int main(void)
         }
     }
     glfwTerminate();
+
+    std::cerr << "checking for leaks.. " << std::endl;
+
     return 0;
 }
