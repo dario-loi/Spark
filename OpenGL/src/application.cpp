@@ -107,8 +107,7 @@ int main(void)
 
         std::vector<Instance> instances;
         instances.push_back(Instance(&triangle));
-        instances.push_back(Instance(&triangle, glm::vec3(0.6f, 0.7f, 0.0f)));
-
+        instances.push_back(Instance(&triangle, glm::vec3(0.7f, 0.6f, 0.0f)));
 
         /*
             Init Shader
@@ -132,16 +131,26 @@ int main(void)
         unsigned int* indices = triangle.getIndexReference();
         
 
+        float lastFrame = 0.0f;
+        float thisFrame;
+
+
         while (!glfwWindowShouldClose(window))
         {
+            thisFrame = glfwGetTime();
+            float deltaTime = thisFrame - lastFrame;
+            lastFrame = thisFrame;
 
             glClear(GL_COLOR_BUFFER_BIT);
             /* Render here */
-            for (Instance inst : instances)
+            for (auto&& inst : instances)
             {
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
+
                 glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
             }
+
+
 
             /* Swap front and back buffers */
 

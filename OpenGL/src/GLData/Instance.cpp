@@ -42,8 +42,8 @@ void Instance::updateModelMatrix()
 	if (trans.vRotation.isUpdated)
 	{
 		mMatrix = glm::rotate(mMatrix, trans.vRotation.vector.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		mMatrix = glm::rotate(mMatrix, trans.vRotation.vector.y, glm::vec3(1.0f, 0.0f, 0.0f));
-		mMatrix = glm::rotate(mMatrix, trans.vRotation.vector.z, glm::vec3(1.0f, 0.0f, 0.0f));
+		mMatrix = glm::rotate(mMatrix, trans.vRotation.vector.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		mMatrix = glm::rotate(mMatrix, trans.vRotation.vector.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
 		trans.vRotation.isUpdated = false;
 	}
@@ -58,40 +58,22 @@ void Instance::updateModelMatrix()
 
 
 
-void Instance::Displace(const glm::vec3 dVec)
+void Instance::Move(const glm::vec3 dVec)
 {
-	trans.vDisplacement.vector += dVec;
+	trans.vDisplacement.vector = dVec;
 	trans.vDisplacement.isUpdated = true;
 }
 
 void Instance::Rotate(const glm::vec3 rVec)
 {
-	trans.vRotation.vector += rVec;
+	trans.vRotation.vector = rVec;
 	trans.vRotation.isUpdated = true;
 }
 
 void Instance::Scale(const glm::vec3 sVec)
 {
-	trans.vScale.vector *= sVec;
+	trans.vScale.vector = sVec;
 	trans.vScale.isUpdated = true;
 }
 
-void Instance::setDisplacement(const glm::vec3 dVec)
-{
 
-	trans.vDisplacement.vector = dVec;
-	trans.vDisplacement.isUpdated = true;
-
-}
-
-void Instance::setRotation(const glm::vec3 rVec)
-{
-	trans.vDisplacement.vector = rVec;
-	trans.vRotation.isUpdated = true;
-}
-
-void Instance::setScaling(const glm::vec3 sVec)
-{
-	trans.vDisplacement.vector = sVec;
-	trans.vScale.isUpdated = true;
-}

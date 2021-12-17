@@ -33,12 +33,9 @@ public:
 	glm::mat4 getModelMatrix();
 	void updateModelMatrix();
 
-	void Displace(const glm::vec3 dVec);
+	void Move(const glm::vec3 dVec);
 	void Rotate(const glm::vec3 rVec);
 	void Scale(const glm::vec3 sVec);
 
-	void setDisplacement(const glm::vec3 dVec);
-	void setRotation(const glm::vec3 rVec);
-	void setScaling(const glm::vec3 sVec);
 };
 
