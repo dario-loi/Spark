@@ -1,14 +1,16 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm.hpp>
 #include <vec3.hpp>
 #include <math.h>
+#include <random>
+#include <vector>
+#include <time.h>
 
 #include "GLData/Model.h"
 #include "GLData/Buffers/VAO.h"
 #include "GLData/Instance.h"
-
-#include <vector>
 
 #include "Shader.h"
 #include "Camera.h"
@@ -33,6 +35,45 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
+constexpr float width = 1280, height = 960;
+float lastX = width / 2, lastY = height / 2;
+
+Camera cam(1000.0f, 4 / 3, 2.5f);
+
+void processInput(GLFWwindow* window, Camera* camera)
+{
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->Move(camera->getViewDirection());
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->Move(-camera->getViewDirection());
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->Move(camera->getSideVector());
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->Move(-camera->getSideVector());
+    if (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera->Sprint(true);
+    else
+        camera->Sprint(false);
+}
+
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+
+    float xoffset = lastX - xpos;
+    float yoffset = ypos  - lastY;
+
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    cam.Rotate(xoffset, yoffset);
+    
+}
 
 int main(void)
 {
@@ -44,19 +85,27 @@ int main(void)
 
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
+
+
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 960, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(width, height, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
 
+
+
+
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
     //vsync
     glfwSwapInterval(1);
+    //Enable Mouse in
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouseCallback);
 
     /* Initialize GLEW*/
 
@@ -123,25 +172,19 @@ int main(void)
             Create Instances
         */
 
-
+        //Randomly gen 100 instances far away
         std::vector<Instance> instances;
-        
-        float offset = 0.25f;
-        for (int y = -2; y < 2; y += 2)
+
+        instances.reserve(100);
+
+        srand(time(NULL));
+
+        for (int c = 0; c < 100; ++c)
         {
-            for (int x = -2; x < 2; x += 2)
-            {
-                glm::vec3 translation;
-                translation.x = (float)x / 4.0f + offset;
-                translation.y = (float)y / 4.0f + offset;
-                translation.z = 1.0f;
-                instances.push_back(Instance(&triangle, translation));
-
-                instances.at(instances.size() - 1).Rotate(glm::vec3(0.0f, 0.0f, 90.0f * abs(x) ) );
-
-            }
+            instances.push_back(Instance(&triangle, glm::vec3((rand()%2000 - 1000)/100, (rand() % 2000 - 1000) / 100, -10.0f + (rand() % 2000 - 1000) / 1000 )));
+            instances.at(c).Scale(glm::vec3(0.5f + (rand() % 2000 - 1000) / 1000, 0.5f + (rand() % 2000 - 1000) / 1000, 0.5f + (rand() % 2000 - 1000) / 1000));
         }
-        
+
 
 
         /*
@@ -168,19 +211,21 @@ int main(void)
         float lastFrame = 0.0f;
         float thisFrame;
 
-        Camera cam(90.0f,  4 / 3);
-
         shader.setUniform4mat("projection", cam.getProj());
 
         while (!glfwWindowShouldClose(window))
         {
+
             thisFrame = glfwGetTime();
             float deltaTime = thisFrame - lastFrame;
             lastFrame = thisFrame;
 
-            shader.setUniform4mat("view", cam.getView());
+            processInput(window, &cam);
+
             
 
+            shader.setUniform4mat("view", cam.getView(deltaTime));
+            
             glClear(GL_COLOR_BUFFER_BIT);
             /* Render here */
             for (auto&& inst : instances)
@@ -189,7 +234,7 @@ int main(void)
 
                 glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
 
-                inst.Rotate(glm::vec3(0.0f, 0.0f, 1.0f));
+                inst.Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
 
             }
 
@@ -203,6 +248,8 @@ int main(void)
             glfwPollEvents();
             
             std::cerr << "Frame time: " << deltaTime << std::endl;
+
+            
         }
     }
     glfwTerminate();
