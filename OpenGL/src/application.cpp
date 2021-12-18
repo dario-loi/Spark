@@ -88,7 +88,7 @@ int main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, height, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(width, height, "D-Engine", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -103,6 +103,14 @@ int main(void)
 
     //vsync
     glfwSwapInterval(1);
+
+    //Enable MSAA
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glEnable(GL_MULTISAMPLE);
+
+    //Enable Depth Testing
+    glEnable(GL_DEPTH_TEST);
+
     //Enable Mouse in
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
@@ -226,7 +234,7 @@ int main(void)
 
             shader.setUniform4mat("view", cam.getView(deltaTime));
             
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             /* Render here */
             for (auto&& inst : instances)
             {

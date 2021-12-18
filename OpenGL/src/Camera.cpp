@@ -4,7 +4,7 @@
 
 Camera::Camera( const float  FOV, float const aspect, float speed)
 	: FOV(FOV), aspect(aspect), pos(glm::vec3(0.0f, 0.0f, 2.0f)), viewDirection(glm::vec3(0.0f, 0.0f, -1.0f)), 
-	up(glm::vec3(0, 1, 0)), isViewInvalidated(false), currSpeed(speed), nextMove(0.0f), rotation(glm::vec2(0.0f,0.0f)), speedWalk(speed), speedSprint(speed*1.44f)
+	up(glm::vec3(0, 1, 0)), isViewInvalidated(false), currSpeed(speed), nextMove(0.0f), rotation(glm::vec2(-90.0f,0.0f)), speedWalk(speed), speedSprint(speed*1.44f)
 {
 	view = glm::lookAt(pos,pos + viewDirection, up);
 	proj = glm::perspective(
