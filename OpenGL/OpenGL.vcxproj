@@ -122,6 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,6 +155,7 @@
     <ClCompile Include="src\application.cpp" />
     <ClCompile Include="src\GLData\Buffers\VBO.cpp" />
     <ClCompile Include="src\GLData\Buffers\VAO.cpp" />
+    <ClCompile Include="src\GLData\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
@@ -164,6 +166,7 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\GLData\Buffers\VBO.h" />
     <ClInclude Include="src\GLData\Buffers\VAO.h" />
+    <ClInclude Include="src\GLData\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile" />

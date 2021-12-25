@@ -53,9 +53,14 @@ void VAO::add_attr<float>(unsigned int count)
 void VAO::init_VAO()
 {
 	int c = 0;
+	unsigned int offset = 0;
+
 	for (const attribute& attr : attributes)
 	{
-		glVertexAttribPointer(c, attr.count, attr.type, GL_FALSE, attr.size, (void*)0);
+		glVertexAttribPointer(c, attr.count, attr.type, GL_FALSE, stride, (void*) offset);
+		offset += attr.size;
+		glEnableVertexAttribArray(c++);
+		
 	}
-	glEnableVertexAttribArray(indx);
+	
 }

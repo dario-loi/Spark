@@ -11,6 +11,7 @@
 #include "GLData/Model.h"
 #include "GLData/Buffers/VAO.h"
 #include "GLData/Instance.h"
+#include "GLData/Texture.h"
 
 #include "Shader.h"
 #include "Camera.h"
@@ -129,39 +130,56 @@ int main(void)
 
     /* Vertex Data*/
     {
-        unsigned int n_verts = 24;
+
+        float x = 0.5f, y = 0.5f, z = 0.5f;
+
+        /*
+        
+        0.0f, 0.0f
+        1.0f, 0.0f
+        1.0f, 1.0f
+        0.0f, 1.0f
+        0.0f, 0.0f
+        1.0f, 0.0f
+        1.0f, 1.0f
+        0.0f, 1.0f
+
+
+        */
+
+        unsigned int n_verts = 8 * 5;
         float* vert = new float[n_verts]
-        {
-            -0.5f, -0.5f,  0.5f,
-            -0.5f, -0.5f, -0.5f,
-            -0.5f,  0.5f,  0.5f,
-            -0.5f,  0.5f, -0.5f,
-             0.5f, -0.5f,  0.5f,
-             0.5f, -0.5f, -0.5f,
-             0.5f,  0.5f,  0.5f,
-             0.5f,  0.5f, -0.5f
+        {  -x, -y, -z, 0.0f, 0.0f, // 0 
+            x, -y, -z, 1.0f, 0.0f, // 1
+            x,  y, -z, 1.0f, 1.0f, // 2
+           -x,  y, -z, 0.0f, 1.0f, // 3
+           -x, -y,  z, 0.0f, 0.0f,// 4
+            x, -y,  z, 1.0f, 0.0f, // 5
+            x,  y,  z, 1.0f, 1.0f, // 6
+           -x,  y,  z, 0.0f, 1.0f  // 7
         };
 
         unsigned int n_indxs = 36;
         GLuint* indx = new GLuint[n_indxs]
         {
-                0, 1, 2, // -x
-                1, 3, 2,
+                4, 5, 6, //z+ 
+                4, 6, 7,
 
-                4, 6, 5, // +x
-                6, 7, 5,
+                7, 3, 0, //x+
+                0, 4, 7,
 
-                0, 5, 1, // -y
-                5, 6, 1,
+                7, 6, 2, //y+
+                2, 3, 7,
 
-                2, 6, 3, // +y
-                6, 7, 3,
+                1, 5, 6, //x-
+                1, 6, 2, 
 
-                0, 4, 2, // +z
-                4, 6, 2,
+                4, 5, 1, //y-
+                4, 1, 0,
 
-                1, 7, 3, // -z
-                5, 7, 1
+                0, 1, 2, //z-
+                0, 2, 3
+
         };
 
         /*
@@ -172,9 +190,12 @@ int main(void)
 
         Model triangle(vert, n_verts, indx, n_indxs);
         triangle.getVAO().add_attr<float>(3);
+        triangle.getVAO().add_attr<float>(2);
         triangle.ModelInit();
 
         triangle.Bind();
+
+
 
         /*
             Create Instances
@@ -193,7 +214,12 @@ int main(void)
             instances.at(c).Scale(glm::vec3(0.5f + (rand() % 2000 - 1000) / 1000, 0.5f + (rand() % 2000 - 1000) / 1000, 0.5f + (rand() % 2000 - 1000) / 1000));
         }
 
+        /*
+            Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
+        */
 
+        Texture tex("res/textures/Bricks512x512.jpg");
+        tex.Bind(1);
 
         /*
             Init Shader
@@ -201,6 +227,7 @@ int main(void)
 
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
+
 
         /* Get window metadata*/
 
@@ -220,6 +247,7 @@ int main(void)
         float thisFrame;
 
         shader.setUniform4mat("projection", cam.getProj());
+        shader.SetUniform1i("u_Texture", 1);
 
         while (!glfwWindowShouldClose(window))
         {
@@ -255,7 +283,7 @@ int main(void)
             /* Poll for and process events */
             glfwPollEvents();
             
-            std::cerr << "Frame time: " << deltaTime << std::endl;
+            //std::cerr << "Frame time: " << deltaTime << std::endl;
 
             
         }
