@@ -1,35 +1,86 @@
 #include "Texture.h"
-#include "GL\glew.h"
+
 #include <iostream>
 #include <cassert>
 
 #include "..\..\res\vendor\stb_image.h"
 
-Texture::Texture(const std::string& filename)
-	: currChannel(0), RenderID(0), imgWidth(0), imgHeight(0), BitDepth(4)
+Texture::Texture(const std::string& filename, const GLenum texType)
+	: currChannel(0), RenderID(0), imgWidth(0), imgHeight(0), BitDepth(4), texType(texType)
 {
+
 	stbi_set_flip_vertically_on_load(1);
 	imageBuffer = stbi_load(filename.c_str(), &imgWidth, &imgHeight, &BitDepth, BitDepth);
-	glEnable(GL_TEXTURE_2D);
 
+	if(!glIsEnabled(texType))
+	{
+		glEnable(texType);
+	}
+	
 	glGenTextures(1, &RenderID);
-
-	glBindTexture(GL_TEXTURE_2D, RenderID);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	
+	assert(imageBuffer, 'Failed to load texture at address: ' + filename.c_str() + "Aborting!");
+	initTexture();
 
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
-
-	
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
+	Unbind();
 }
+
+Texture::~Texture()
+{
+	Unbind();
+	stbi_image_free(imageBuffer);
+}
+
+/**
+*  \brief Allows and incapsulates different initializations based on the texture's type.
+*
+*  \return void
+*/
+void Texture::initTexture()
+{
+	switch (texType)
+	{
+	case GL_TEXTURE_2D:
+
+		glBindTexture(texType, RenderID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
+
+		glGenerateMipmap(texType);
+		break;
+
+	case GL_TEXTURE_CUBE_MAP:
+
+		glBindTexture(texType, RenderID);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		for (unsigned int face = 0; face < 6; face++)
+		{
+			std::cerr << "Currently processing face number: " << face << std::endl;
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_RGBA8, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer
+			);
+		}
+
+		glGenerateMipmap(texType);
+		break;
+
+	default:
+		assert(true, 'Unsupported Texture type, come back later!');
+		break;
+	}
+}
+
 
 void Texture::Bind(unsigned int channel) const
 {
@@ -40,15 +91,16 @@ void Texture::Bind(unsigned int channel) const
 	}
 	else
 	{
-		assert(true);
 		std::cerr << "Currently selected texture slot (" << channel << ") is unavailable in " <<
 			"the current platform, overwriting slot (0)" << std::endl;
 		glActiveTexture(GL_TEXTURE0);
 	}
-	glBindTexture(GL_TEXTURE_2D, RenderID);
+	glBindTexture(texType, RenderID);
 }
 
 void Texture::Unbind() const
 {
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(texType, 0);
+	glDisable(texType);
 }
+

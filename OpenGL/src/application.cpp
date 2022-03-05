@@ -131,7 +131,7 @@ int main(void)
     /* Vertex Data*/
     {
 
-        float x = 0.5f, y = 0.5f, z = 0.5f;
+        float x = 1.0f, y = 1.0f, z = 1.0f;
 
         /*
         
@@ -147,16 +147,16 @@ int main(void)
 
         */
 
-        unsigned int n_verts = 8 * 5;
+        unsigned int n_verts = 8 * 3;
         float* vert = new float[n_verts]
-        {  -x, -y, -z, 0.0f, 0.0f, // 0 
-            x, -y, -z, 1.0f, 0.0f, // 1
-            x,  y, -z, 1.0f, 1.0f, // 2
-           -x,  y, -z, 0.0f, 1.0f, // 3
-           -x, -y,  z, 0.0f, 0.0f,// 4
-            x, -y,  z, 1.0f, 0.0f, // 5
-            x,  y,  z, 1.0f, 1.0f, // 6
-           -x,  y,  z, 0.0f, 1.0f  // 7
+        {  -x, -y, -z, // 0 
+            x, -y, -z, // 1
+            x,  y, -z, // 2
+           -x,  y, -z, // 3
+           -x, -y,  z, // 4
+            x, -y,  z, // 5
+            x,  y,  z, // 6
+           -x,  y,  z // 7
         };
 
         unsigned int n_indxs = 36;
@@ -190,7 +190,6 @@ int main(void)
 
         Model triangle(vert, n_verts, indx, n_indxs);
         triangle.getVAO().add_attr<float>(3);
-        triangle.getVAO().add_attr<float>(2);
         triangle.ModelInit();
 
         triangle.Bind();
@@ -211,14 +210,14 @@ int main(void)
         for (int c = 0; c < 100; ++c)
         {
             instances.push_back(Instance(&triangle, glm::vec3((rand()%2000 - 1000)/100, (rand() % 2000 - 1000) / 100, -10.0f + (rand() % 2000 - 1000) / 1000 )));
-            instances.at(c).Scale(glm::vec3(0.5f + (rand() % 2000 - 1000) / 1000, 0.5f + (rand() % 2000 - 1000) / 1000, 0.5f + (rand() % 2000 - 1000) / 1000));
+            instances.at(c).Scale(glm::vec3(0.3f));
         }
 
         /*
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
         */
 
-        Texture tex("res/textures/Bricks512x512.jpg");
+        Texture tex("res/textures/Bricks512x512.jpg", GL_TEXTURE_CUBE_MAP);
         tex.Bind(1);
 
         /*
