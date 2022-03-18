@@ -13,6 +13,8 @@
 #include "GLData/Instance.h"
 #include "GLData/Texture.h"
 
+#include "Controllers/RandomGenerator.h"
+
 #include "Shader.h"
 #include "Camera.h"
 
@@ -36,8 +38,11 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
-constexpr float width = 1280, height = 960;
-float lastX = width / 2, lastY = height / 2;
+constexpr int width = 1280;
+constexpr int height = 960;
+
+float lastX = width / 2;
+float lastY = height / 2;
 
 Camera cam(1000.0f, 4 / 3, 2.5f);
 
@@ -89,7 +94,7 @@ int main(void)
 
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, height, "D-Engine", NULL, NULL);
+    window = glfwCreateWindow(width, height, "D-Engine", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -128,12 +133,14 @@ int main(void)
     /* Init GL Debugging */
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, 0);
+    glDebugMessageCallback(MessageCallback, nullptr);
 
     /* Vertex Data*/
     {
 
-        float x = 1.0f, y = 1.0f, z = 1.0f;
+        auto x = 1.0f;
+        auto y = 1.0f;
+        auto z = 1.0f;
 
         /*
         
@@ -196,8 +203,6 @@ int main(void)
 
         triangle.Bind();
 
-
-
         /*
             Create Instances
         */
@@ -207,11 +212,17 @@ int main(void)
 
         instances.reserve(100);
 
-        srand(time(NULL));
-
+        auto posDistribution = RandomGenerator::getRealDistribution(-10, 10);
+        auto gen = RandomGenerator::getGenerator();
         for (int c = 0; c < 100; ++c)
         {
-            instances.push_back(Instance(&triangle, glm::vec3((rand()%2000 - 1000)/100, (rand() % 2000 - 1000) / 100, -10.0f + (rand() % 2000 - 1000) / 1000 )));
+            auto position = glm::vec3(
+                posDistribution(gen),
+                posDistribution(gen),
+                posDistribution(gen)
+            );
+
+            instances.emplace_back(Instance(&triangle, position));
             instances.at(c).Scale(glm::vec3(0.3f));
         }
 
@@ -232,17 +243,10 @@ int main(void)
 
         /* Get window metadata*/
 
-        //GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        //const GLFWvidmode* vidAttr = glfwGetVideoMode(monitor);
-
-        //std::cout << " width is " << vidAttr->width << " height is " << vidAttr->height << std::endl;
-
         //locate uniform addresses
 
 
         /* Loop until the user closes the window */
-
-        unsigned int* indices = triangle.getIndexReference();
         
         float lastFrame = 0.0f;
         float thisFrame;
@@ -271,7 +275,7 @@ int main(void)
 
                 glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
 
-                //inst.Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
+                inst.Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
 
             }
 
@@ -284,12 +288,11 @@ int main(void)
             /* Poll for and process events */
             glfwPollEvents();
             
-            //std::cerr << "Frame time: " << deltaTime << std::endl;
-
-            
         }
+
     }
     glfwTerminate();
+
 
     std::cerr << "checking for leaks.. " << std::endl;
 

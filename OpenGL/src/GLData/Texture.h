@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "GL\glew.h"
+#include "GL/glew.h"
 
 class Texture
 {
@@ -22,6 +22,6 @@ private:
 	int BitDepth;
 	GLenum texType;
 
-	void initTexture();
+	void initTexture() const;
 };
 

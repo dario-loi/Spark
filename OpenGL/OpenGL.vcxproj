@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Controllers\RandomGenerator.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\GLData\Instance.cpp" />
     <ClCompile Include="src\GLData\Model.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="src\GLData\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Controllers\RandomGenerator.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\GLData\Instance.h" />
     <ClInclude Include="src\GLData\Model.h" />

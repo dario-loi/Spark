@@ -18,14 +18,20 @@ Instance::Instance(Model* object_model, glm::vec3 position)
 	updateModelMatrix();
 }
 
-Instance::~Instance()
+Instance::Instance(const Instance& inst)
 {
+	this->mMatrix = inst.mMatrix;
+	this->trans = inst.trans;
+	this->objModel = inst.objModel;
 }
 
-Model* Instance::getModel()
+Instance& Instance::operator=(const Instance&)
 {
-	return objModel;
+
+	return *this;
 }
+
+Instance::~Instance() = default;
 
 glm::mat4 Instance::getModelMatrix()
 {

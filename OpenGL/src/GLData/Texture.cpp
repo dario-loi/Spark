@@ -37,7 +37,7 @@ Texture::~Texture()
 *
 *  \return void
 */
-void Texture::initTexture()
+void Texture::initTexture() const
 {
 	switch (texType)
 	{
