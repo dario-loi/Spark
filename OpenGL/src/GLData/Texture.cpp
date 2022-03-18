@@ -6,7 +6,7 @@
 #include "..\..\res\vendor\stb_image.h"
 
 Texture::Texture(const std::string& filename, const GLenum texType)
-	: currChannel(0), RenderID(0), imgWidth(0), imgHeight(0), BitDepth(4), texType(texType)
+	: RenderID(0), currChannel(0),  imgWidth(0), imgHeight(0), BitDepth(4), texType(texType)
 {
 
 	stbi_set_flip_vertically_on_load(1);

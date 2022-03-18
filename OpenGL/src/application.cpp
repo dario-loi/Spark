@@ -109,6 +109,8 @@ int main(void)
     glfwWindowHint(GLFW_SAMPLES, 4);
     glEnable(GL_MULTISAMPLE);
 
+    //Enable Face Culling for additional performance 
+    glEnable(GL_CULL_FACE);
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
 
@@ -120,7 +122,7 @@ int main(void)
 
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Error!" << std::endl;
+        std::cerr << "Error!" << std::endl;
     }
 
     /* Init GL Debugging */
@@ -148,7 +150,7 @@ int main(void)
         */
 
         unsigned int n_verts = 8 * 3;
-        float* vert = new float[n_verts]
+        auto* vert = new float[n_verts]
         {  -x, -y, -z, // 0 
             x, -y, -z, // 1
             x,  y, -z, // 2
@@ -156,29 +158,29 @@ int main(void)
            -x, -y,  z, // 4
             x, -y,  z, // 5
             x,  y,  z, // 6
-           -x,  y,  z // 7
+           -x,  y,  z  // 7
         };
 
         unsigned int n_indxs = 36;
-        GLuint* indx = new GLuint[n_indxs]
+        auto* indx = new GLuint[n_indxs]
         {
-                4, 5, 6, //z+ 
+                4, 5, 6, //z+ front
                 4, 6, 7,
 
-                7, 3, 0, //x+
+                7, 3, 0, //x+ right
                 0, 4, 7,
 
-                7, 6, 2, //y+
+                7, 6, 2, //y+ top
                 2, 3, 7,
 
-                1, 5, 6, //x-
-                1, 6, 2, 
+                6, 5, 1, //x- left
+                2, 6, 1, 
 
-                4, 5, 1, //y-
-                4, 1, 0,
+                1, 5, 4, //y- bottom
+                0, 1, 4,
 
-                0, 1, 2, //z-
-                0, 2, 3
+                2, 1, 0, //z- back
+                3, 2, 0
 
         };
 
@@ -269,7 +271,7 @@ int main(void)
 
                 glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
 
-                inst.Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
+                //inst.Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
 
             }
 
