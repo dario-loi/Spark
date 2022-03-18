@@ -1,7 +1,8 @@
 #pragma once
-#include "Buffers\EBO.h"
-#include "Buffers\VAO.h"
-#include "Buffers\VBO.h"
+#include "Buffers/EBO.h"
+#include "Buffers/VAO.h"
+#include "Buffers/VBO.h"
+
 
 class Model
 {
@@ -11,8 +12,8 @@ private:
 	VAO m_Vao;
 
 public:
-	Model(float* vertices, unsigned int size_vertices, 
-		unsigned int* indices, unsigned int size_indices);
+	Model(std::unique_ptr<float[]> vertices, unsigned int size_vertices,
+		std::unique_ptr<unsigned int[]> indices, unsigned int size_indices);
 	~Model();
 
 	void Bind();

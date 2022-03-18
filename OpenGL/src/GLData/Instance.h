@@ -26,10 +26,6 @@ private:
 public:
 
 	Instance(Model* object_model, glm::vec3 position = glm::vec3(0.0f));
-	Instance(const Instance& inst);
-	Instance& operator=(const Instance&);
-
-	~Instance();
 
 	Model* getModel() const { return objModel; };
 	glm::mat4 getModelMatrix();

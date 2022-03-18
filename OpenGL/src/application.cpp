@@ -5,6 +5,7 @@
 #include <vec3.hpp>
 #include <math.h>
 #include <random>
+#include <memory>
 #include <vector>
 #include <time.h>
 
@@ -79,6 +80,19 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 
     cam.Rotate(xoffset, yoffset);
     
+}
+
+namespace deleter {
+
+    template< typename T >
+    struct array_deleter
+    {
+        void operator ()(T const* p)
+        {
+            delete[] p;
+        }
+    };
+
 }
 
 int main(void)
@@ -156,21 +170,43 @@ int main(void)
 
         */
 
+        /*
+        
+        {
+                -x, -y, -z, // 0
+                 x, -y, -z, // 1
+                 x,  y, -z, // 2
+                -x,  y, -z, // 3
+                -x, -y,  z, // 4
+                 x, -y,  z, // 5
+                 x,  y,  z, // 6
+                -x,  y,  z  // 7
+        }
+
+        */
+
         unsigned int n_verts = 8 * 3;
-        auto* vert = new float[n_verts]
-        {  -x, -y, -z, // 0 
-            x, -y, -z, // 1
-            x,  y, -z, // 2
-           -x,  y, -z, // 3
-           -x, -y,  z, // 4
-            x, -y,  z, // 5
-            x,  y,  z, // 6
-           -x,  y,  z  // 7
+
+        auto temp_v = new float[n_verts] {         
+            -x, -y, -z, // 0 
+             x, -y, -z, // 1
+             x,  y, -z, // 2
+            -x,  y, -z, // 3
+            -x, -y,  z, // 4
+             x, -y,  z, // 5
+             x,  y,  z, // 6
+             -x, y,  z  // 7
         };
 
+        auto vert = std::make_unique<float[]>(n_verts);
+
+        memcpy(vert.get(), temp_v, n_verts * sizeof(float)); // "at this point just directly use a raw pointer" i know, i know...
+
+        delete[] temp_v;
+
         unsigned int n_indxs = 36;
-        auto* indx = new GLuint[n_indxs]
-        {
+
+        auto temp_i = new unsigned int[n_indxs] {
                 4, 5, 6, //z+ front
                 4, 6, 7,
 
@@ -181,7 +217,7 @@ int main(void)
                 2, 3, 7,
 
                 6, 5, 1, //x- left
-                2, 6, 1, 
+                2, 6, 1,
 
                 1, 5, 4, //y- bottom
                 0, 1, 4,
@@ -191,13 +227,17 @@ int main(void)
 
         };
 
+        auto indx = std::make_unique<unsigned int[]>(n_indxs);
+
+        memcpy(indx.get(), temp_i, n_indxs * sizeof(unsigned int));
+
+        delete[] temp_i;
+        
         /*
             Create Model
         */
         
-
-
-        Model triangle(vert, n_verts, indx, n_indxs);
+        Model triangle(std::move(vert), n_verts, std::move(indx), n_indxs);
         triangle.getVAO().add_attr<float>(3);
         triangle.ModelInit();
 
@@ -278,8 +318,6 @@ int main(void)
                 inst.Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
 
             }
-
-
 
             /* Swap front and back buffers */
 

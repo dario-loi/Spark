@@ -1,13 +1,14 @@
+#pragma once
 #include "VBO.h"
 #include "GL/glew.h"
 
-VBO::VBO(float* vertices, unsigned int length)
-	: verts(vertices), size(length), isBound(false)
+VBO::VBO(std::unique_ptr<float[]> vertices, unsigned int length)
+	: size(length)
 {
-
+	this->verts = std::move(vertices);
 	glGenBuffers(1, &RenderID);
 	glBindBuffer(GL_ARRAY_BUFFER, RenderID);
-	glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), verts.get(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
@@ -15,38 +16,21 @@ VBO::VBO(float* vertices, unsigned int length)
 
 VBO::~VBO()
 {
-	delete[] verts;
 	glDeleteBuffers(1, &RenderID);
 }
 
-void VBO::Bind()
+void VBO::Bind() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, RenderID);
-	isBound = true;
 }
 
-void VBO::Unbind()
+void VBO::Unbind() const 
 {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	isBound = false;
 }
 
-void VBO::setArray(float* newArr)
+void VBO::setArray(std::unique_ptr<float[]> newArr)
 {
-	verts = newArr;
+	verts = std::move(newArr);
 }
 
-float* VBO::getArray()
-{
-	return verts;
-}
-
-unsigned int VBO::getRenderID()
-{
-	return RenderID;
-}
-
-unsigned int VBO::getSize()
-{
-	return size;
-}

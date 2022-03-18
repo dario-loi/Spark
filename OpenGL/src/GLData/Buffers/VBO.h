@@ -1,27 +1,28 @@
+#pragma once
+#include <memory>
+
 class VBO
 {
 private:
 	unsigned int RenderID;
-	float* verts;
+	std::unique_ptr<float[]> verts;
 	unsigned int size;
-	bool isBound;
 
 public:
 
-	 VBO(float* vertices, unsigned int length);
+	 VBO(std::unique_ptr<float[]> vertices, unsigned int length);
 	~VBO();
+	
 
-	void Bind();
-	void Unbind();
+	void Bind() const;
+	void Unbind() const;
 
-	void setArray(float* newArr);
-	float* getArray();
+	void setArray(std::unique_ptr<float[]> newArr);
 
-	unsigned int getRenderID();
+	unsigned int getRenderID() const { return RenderID; }
 
-	unsigned int getSize();
+	unsigned int getSize() const { return size; }
 
-	//const and dest
 
 };
 

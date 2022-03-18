@@ -1,28 +1,29 @@
 #pragma once
+#include <memory>
 class EBO
 {
 private:
 	unsigned int RenderID;
-	unsigned int* indx;
+	std::unique_ptr<unsigned int[]> indx;
 	unsigned int size;
-	bool isBound;
 
 public:
 
-	EBO(unsigned int* indices, unsigned int length);
+	EBO(std::unique_ptr<unsigned int[]> indices, unsigned int length);
 	~EBO();
 
-	void Bind();
-	void Unbind();
+	void Bind() const;
+	void Unbind() const;
 
-	void setArray(unsigned int* newArr);
-	unsigned int* getArray();
+	void setArray(std::unique_ptr<unsigned int[]> newArr);
 
-	unsigned int getRenderID();
+	unsigned int getRenderID() const { return RenderID; }
 
-	unsigned int getSize();
+	unsigned int getSize() const { return size; }
 
-	//const and dest
+	//ONLY IF YOU ARE ACCESSING IT FOR OPENGL PURPOSES, I AM WATCHING YOU!
+
+	unsigned int* getArray() const { return indx.get(); }	
 
 };
 
