@@ -57,6 +57,10 @@ void processInput(GLFWwindow* window, Camera* camera)
         camera->Move(camera->getSideVector());
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera->Move(-camera->getSideVector());
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera->Move(-camera->getUpDirection());
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        camera->Move(camera->getUpDirection());
     if (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)

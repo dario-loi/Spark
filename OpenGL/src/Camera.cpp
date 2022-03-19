@@ -25,35 +25,15 @@ glm::mat4 Camera::getView(float delta)
 	return view;
 }
 
-glm::mat4 Camera::getProj()
-{
-	return proj;
-}
-
-float Camera::getSpeed()
-{
-	return currSpeed;
-}
-
 void Camera::setSpeed(float speed)
 {
 	this->currSpeed = speed;
 }
 
-glm::vec3 Camera::getSideVector()
+glm::vec3 Camera::getSideVector() const
 {
 
 	return glm::normalize(glm::cross(viewDirection, up));
-}
-
-glm::vec3 Camera::getViewDirection()
-{
-	return viewDirection;
-}
-
-float Camera::getFOV()
-{
-	return FOV;
 }
 
 void Camera::setFOV(const float newFOV)
@@ -122,5 +102,5 @@ void Camera::Rotate(float yaw, float pitch)
 
 void Camera::Sprint(bool shouldSprint)
 {
-	currSpeed = (shouldSprint) ? speedSprint : speedWalk;
+	currSpeed = shouldSprint ? speedSprint : speedWalk;
 }

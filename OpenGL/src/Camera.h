@@ -33,14 +33,15 @@ public:
    ~Camera();
 
 	glm::mat4 getView(float delta);
-	glm::mat4 getProj();
-	float getSpeed();
+	glm::mat4 getProj() const { return proj; }
+	float getSpeed() const { return currSpeed; }
 	void  setSpeed(float speed);
 
-	glm::vec3 getSideVector();
-	glm::vec3 getViewDirection();
+	glm::vec3 getSideVector() const;
+	glm::vec3 getViewDirection() const { return viewDirection; }
+	glm::vec3 getUpDirection() const { return up; }
 
-	float getFOV();
+	float getFOV() const { return FOV; }
 	void setFOV( float newFOV);
 
 	void UpdateView(float delta);
