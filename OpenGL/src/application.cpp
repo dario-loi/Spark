@@ -153,43 +153,16 @@ int main(void)
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, nullptr);
 
-    /* Vertex Data*/
+    
     {
-
+        /* 
+            Vertex Data Initialization
+        */
         auto x = 1.0f;
         auto y = 1.0f;
         auto z = 1.0f;
 
-        /*
-        
-        0.0f, 0.0f
-        1.0f, 0.0f
-        1.0f, 1.0f
-        0.0f, 1.0f
-        0.0f, 0.0f
-        1.0f, 0.0f
-        1.0f, 1.0f
-        0.0f, 1.0f
-
-
-        */
-
-        /*
-        
-        {
-                -x, -y, -z, // 0
-                 x, -y, -z, // 1
-                 x,  y, -z, // 2
-                -x,  y, -z, // 3
-                -x, -y,  z, // 4
-                 x, -y,  z, // 5
-                 x,  y,  z, // 6
-                -x,  y,  z  // 7
-        }
-
-        */
-
-        unsigned int n_verts = 8 * 3;
+        constexpr unsigned int n_verts = 8 * 3;
 
         auto temp_v = new float[n_verts] {         
             -x, -y, -z, // 0 
@@ -208,7 +181,7 @@ int main(void)
 
         delete[] temp_v;
 
-        unsigned int n_indxs = 36;
+        constexpr unsigned int n_indxs = 6*2*3;
 
         auto temp_i = new unsigned int[n_indxs] {
                 4, 5, 6, //z+ front
@@ -254,11 +227,13 @@ int main(void)
         //Randomly gen 100 instances far away
         std::vector<Instance> instances;
 
-        instances.reserve(100);
+        unsigned int INSTANCES = 100;
+
+        instances.reserve(INSTANCES);
 
         auto posDistribution = RandomGenerator::getRealDistribution(-10, 10);
         auto gen = RandomGenerator::getGenerator();
-        for (int c = 0; c < 100; ++c)
+        for (int c = 0; c < INSTANCES; ++c)
         {
             auto position = glm::vec3(
                 posDistribution(gen),
@@ -317,10 +292,9 @@ int main(void)
             {
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
 
-                glDrawElements(GL_TRIANGLES, inst.getModel()->getIndexSize(), GL_UNSIGNED_INT, inst.getModel()->getIndexReference());
-
-                inst.Rotate(glm::vec3(0.0f, 1.0f, 0.0f));
-
+                inst.Draw();
+                inst.Rotate(glm::vec3(0.5f, 1.0f, 1.0f));
+                inst.Scale(glm::vec3(1.001f, 1.001f, 1.001f));
             }
 
             /* Swap front and back buffers */
@@ -336,7 +310,7 @@ int main(void)
     glfwTerminate();
 
 
-    std::cerr << "checking for leaks.. " << std::endl;
+    std::clog << "checking for leaks.. " << std::endl;
 
     return 0;
 }

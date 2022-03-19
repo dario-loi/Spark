@@ -55,22 +55,27 @@ void Instance::updateModelMatrix()
 
 
 
-void Instance::Move(const glm::vec3 dVec)
+void Instance::Move(const glm::vec3& dVec)
 {
 	trans.vDisplacement.vector = dVec;
 	trans.vDisplacement.isUpdated = true;
 }
 
-void Instance::Rotate(const glm::vec3 rVec)
+void Instance::Rotate(const glm::vec3& rVec)
 {
 	trans.vRotation.vector = rVec;
 	trans.vRotation.isUpdated = true;
 }
 
-void Instance::Scale(const glm::vec3 sVec)
+void Instance::Scale(const glm::vec3& sVec)
 {
 	trans.vScale.vector = sVec;
 	trans.vScale.isUpdated = true;
+}
+
+void Instance::Draw() const
+{
+	glDrawElements(GL_TRIANGLES, objModel->getIndexSize(), GL_UNSIGNED_INT, objModel->getIndexReference());
 }
 
 
