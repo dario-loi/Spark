@@ -7,6 +7,7 @@
 #include <random>
 #include <memory>
 #include <vector>
+#include <array>
 #include <time.h>
 
 #include "GLData/Model.h"
@@ -109,8 +110,6 @@ int main(void)
 
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-
-
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(width, height, "D-Engine", nullptr, nullptr);
     if (!window)
@@ -118,9 +117,6 @@ int main(void)
         glfwTerminate();
         return -1;
     }
-
-
-
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -136,6 +132,8 @@ int main(void)
     glEnable(GL_CULL_FACE);
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
+    //Enable Gamma Correction (Turn on as soon as we have proper lightning processed)
+    //glEnable(GL_FRAMEBUFFER_SRGB);
 
     //Enable Mouse in
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -249,8 +247,12 @@ int main(void)
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
         */
 
-        Texture tex("res/textures/Bricks512x512.jpg", GL_TEXTURE_CUBE_MAP);
-        tex.Bind(1);
+        std::array<Texture, 2> textures{
+            {
+                Texture("res/textures/Grass.png", GL_TEXTURE_CUBE_MAP),
+                Texture("res/textures/Bricks512x512.jpg", GL_TEXTURE_CUBE_MAP)
+            }
+        };
 
         /*
             Init Shader
@@ -259,19 +261,12 @@ int main(void)
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
 
-
-        /* Get window metadata*/
-
-        //locate uniform addresses
-
-
         /* Loop until the user closes the window */
         
         float lastFrame = 0.0f;
         float thisFrame;
 
         shader.setUniform4mat("projection", cam.getProj());
-        shader.SetUniform1i("u_Texture", 1);
 
         while (!glfwWindowShouldClose(window))
         {
@@ -282,23 +277,28 @@ int main(void)
 
             processInput(window, &cam);
 
-            
 
             shader.setUniform4mat("view", cam.getView(deltaTime));
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            unsigned int inst_indx = 0;
+
             /* Render here */
             for (auto&& inst : instances)
             {
+                textures.at((inst_indx % 2)).Bind((inst_indx % 2));
+                shader.SetUniform1i("u_Texture", (inst_indx % 2));
+                
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
 
                 inst.Draw();
-                inst.Rotate(glm::vec3(0.5f, 1.0f, 1.0f));
-                inst.Scale(glm::vec3(1.001f, 1.001f, 1.001f));
+                inst.Rotate(glm::vec3(0.2f, 1.0f, 0.4f));
+
+                inst_indx += 1;
             }
 
             /* Swap front and back buffers */
-
             glfwSwapBuffers(window);
 
             /* Poll for and process events */
