@@ -3,4 +3,4 @@ Debug/OpenGL.exe
 x64/Debug/OpenGL.exe
 OpenGL/x64/Debug/application.obj
 OpenGL/Debug/application.obj
-Dependencies\ASSIMP\CMAKE\**
+Dependencies/ASSIMP/CMAKE/**
