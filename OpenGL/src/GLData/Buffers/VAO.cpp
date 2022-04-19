@@ -18,8 +18,6 @@ VAO::~VAO()
 
 }
 
-
-
 void VAO::Bind()
 {
 

@@ -1,7 +1,7 @@
 #include "Model.h"
 Model::Model(std::unique_ptr<float[]> vertices, unsigned int size_vertices, std::unique_ptr<unsigned int[]> indices,
 	unsigned int size_indices)
-	: m_Vbo(std::move(vertices), size_vertices), m_Ebo(std::move(indices), size_indices), m_Vao(0)
+	: m_Vbo(std::move(vertices), size_vertices), m_Ebo(std::move(indices), size_indices), m_Vao(++Model::free_idx)
 {
 	
 }
@@ -55,3 +55,5 @@ VBO& Model::getVBO()
 {
 	return m_Vbo;
 }
+
+long long int Model::free_idx = 0;

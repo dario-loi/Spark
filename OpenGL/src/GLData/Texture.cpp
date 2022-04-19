@@ -1,7 +1,7 @@
 #include "Texture.h"
 
 #include <iostream>
-#include <cassert>
+#include <assert.h>
 
 #include "..\..\res\vendor\stb_image.h"
 

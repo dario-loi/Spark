@@ -175,8 +175,14 @@
       <ShowProgress>LinkVerboseLib</ShowProgress>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glew32s.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(SolutionDir)Dependencies\ASSIMP\lib-vc2022\assimp-vc142-mt.dll" "$(OutDir)"</Command>
+      <Message>Copies dlls</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Controllers\ModelLoader.cpp" />
+    <ClCompile Include="src\EngineObj\Scene.cpp" />
     <ClCompile Include="src\Controllers\RandomGenerator.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\GLData\Instance.cpp" />
@@ -190,6 +196,8 @@
     <ClCompile Include="src\GLData\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Controllers\ModelLoader.h" />
+    <ClInclude Include="src\EngineObj\Scene.h" />
     <ClInclude Include="src\Controllers\RandomGenerator.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\GLData\Instance.h" />
