@@ -11,6 +11,10 @@
 #define GLM_PRECISION_MEDIUMP_UINT
 #include <glm.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <vec3.hpp>
 #include <math.h>
 #include <random>
