@@ -1,7 +1,16 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#define GLM_FORCE_MESSAGES
+#define GLM_FORCE_ALIGNED_GENTYPES
+#define GLM_FORCE_INTRINSICS 
+#define GLM_PRECISION_MEDIUMP_FLOAT
+#define GLM_PRECISION_MEDIUMP_INT
+#define GLM_PRECISION_MEDIUMP_DOUBLE
+#define GLM_PRECISION_MEDIUMP_UINT
 #include <glm.hpp>
+
 #include <vec3.hpp>
 #include <math.h>
 #include <random>
