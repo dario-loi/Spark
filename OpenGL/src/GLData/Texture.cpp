@@ -5,7 +5,7 @@
 
 #include "..\..\res\vendor\stb_image.h"
 
-Texture::Texture(const std::string& filename, const GLenum texType)
+Texture::Texture(std::string const& filename, const GLenum texType)
 	: RenderID(0), currChannel(0),  imgWidth(0), imgHeight(0), BitDepth(4), texType(texType)
 {
 
@@ -19,7 +19,12 @@ Texture::Texture(const std::string& filename, const GLenum texType)
 	
 	glGenTextures(1, &RenderID);
 	
-	assert(imageBuffer, 'Failed to load texture at address: ' + filename.c_str() + "Aborting!");
+	if (!imageBuffer)
+	{
+		std::cerr << "Failed to load texture at address: " + filename + ", Aborting!" << std::endl;
+		assert(false);
+	}
+
 	initTexture();
 
 	

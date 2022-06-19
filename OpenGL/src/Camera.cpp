@@ -15,9 +15,7 @@ Camera::Camera( const float  FOV, float const aspect, float speed)
 	);
 }
 
-Camera::~Camera()
-{
-}
+Camera::~Camera() = default;
 
 glm::mat4 Camera::getView(float delta)
 {

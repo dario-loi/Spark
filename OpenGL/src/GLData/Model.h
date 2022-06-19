@@ -2,10 +2,8 @@
 #include "Buffers/EBO.h"
 #include "Buffers/VAO.h"
 #include "Buffers/VBO.h"
+#include "..\Utility\Importer.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 class Model
 {
@@ -14,11 +12,10 @@ private:
 	EBO m_Ebo;
 	VAO m_Vao;
 
-	static long long int free_idx;
+
 
 public:
-	Model(std::unique_ptr<float[]> vertices, unsigned int size_vertices,
-		  std::unique_ptr<unsigned int[]> indices, unsigned int size_indices);
+	Model(std::vector<float>&& vertices, std::vector<unsigned int>&& indices);
 	~Model();
 
 	void Bind();
@@ -27,9 +24,11 @@ public:
 	void ModelInit();
 	VAO& getVAO();
 	EBO& getEBO();
-	unsigned int* getIndexReference();
-	unsigned int  getIndexSize();
-	VBO& getVBO(); 
+	std::vector<unsigned int> const& getIndexReference() const;
+	size_t  getIndexSize() const;
+	VBO const& getVBO() const; 
+
+	static size_t free_idx;
 
 };
 

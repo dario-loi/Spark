@@ -1,4 +1,6 @@
 #include <iostream>
+#include <filesystem>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -10,10 +12,6 @@
 #define GLM_PRECISION_MEDIUMP_DOUBLE
 #define GLM_PRECISION_MEDIUMP_UINT
 #include <glm.hpp>
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 #include <vec3.hpp>
 #include <math.h>
@@ -27,6 +25,7 @@
 #include "GLData/Buffers/VAO.h"
 #include "GLData/Instance.h"
 #include "GLData/Texture.h"
+#include "Utility/Importer.h"
 
 #include "Controllers/RandomGenerator.h"
 
@@ -53,13 +52,14 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
-constexpr int width = 1280;
-constexpr int height = 960;
+constexpr int width = 1024;
+constexpr int height = 768;
 
 float lastX = width / 2;
 float lastY = height / 2;
 
 Camera cam(1000.0f, 4 / 3, 2.5f);
+objl::Loader loader;
 
 void processInput(GLFWwindow* window, Camera* camera)
 {
@@ -100,19 +100,6 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
     
 }
 
-namespace deleter {
-
-    template< typename T >
-    struct array_deleter
-    {
-        void operator ()(T const* p)
-        {
-            delete[] p;
-        }
-    };
-
-}
-
 int main(void)
 {
 
@@ -131,7 +118,7 @@ int main(void)
         return -1;
     }
 
-    /* Make the window's context current */
+    //Make the window's context current
     glfwMakeContextCurrent(window);
 
     //vsync
@@ -145,8 +132,11 @@ int main(void)
     glEnable(GL_CULL_FACE);
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
-    //Enable Gamma Correction (Turn on as soon as we have proper lightning processed)
-    //glEnable(GL_FRAMEBUFFER_SRGB);
+    /*
+        TODO Enable Gamma Correction (Turn on as soon as we have proper lightning processed)
+        glEnable(GL_FRAMEBUFFER_SRGB);
+    */
+
 
     //Enable Mouse in
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -166,6 +156,11 @@ int main(void)
 
     
     {
+    
+
+        std::cout << std::filesystem::current_path();
+
+
         /* 
             Vertex Data Initialization
         */
@@ -173,9 +168,7 @@ int main(void)
         auto y = 1.0f;
         auto z = 1.0f;
 
-        constexpr unsigned int n_verts = 8 * 3;
-
-        auto temp_v = new float[n_verts] {         
+        std::vector<float> vert = {         
             -x, -y, -z, // 0 
              x, -y, -z, // 1
              x,  y, -z, // 2
@@ -183,18 +176,11 @@ int main(void)
             -x, -y,  z, // 4
              x, -y,  z, // 5
              x,  y,  z, // 6
-             -x, y,  z  // 7
+            -x,  y,  z  // 7
         };
 
-        auto vert = std::make_unique<float[]>(n_verts);
 
-        memcpy(vert.get(), temp_v, n_verts * sizeof(float)); // "at this point just directly use a raw pointer" i know, i know...
-
-        delete[] temp_v;
-
-        constexpr unsigned int n_indxs = 6*2*3;
-
-        auto temp_i = new unsigned int[n_indxs] {
+        std::vector<unsigned int> indx = {
                 4, 5, 6, //z+ front
                 4, 6, 7,
 
@@ -215,17 +201,13 @@ int main(void)
 
         };
 
-        auto indx = std::make_unique<unsigned int[]>(n_indxs);
 
-        memcpy(indx.get(), temp_i, n_indxs * sizeof(unsigned int));
-
-        delete[] temp_i;
         
         /*
             Create Model
         */
         
-        Model triangle(std::move(vert), n_verts, std::move(indx), n_indxs);
+        Model triangle(std::move(vert), std::move(indx));
         triangle.getVAO().add_attr<float>(3);
         triangle.ModelInit();
 
@@ -238,22 +220,27 @@ int main(void)
         //Randomly gen 100 instances far away
         std::vector<Instance> instances;
 
-        unsigned int INSTANCES = 100;
+        constexpr const unsigned int INSTANCES = 20000;
 
         instances.reserve(INSTANCES);
 
         auto posDistribution = RandomGenerator::getRealDistribution(-10, 10);
         auto gen = RandomGenerator::getGenerator();
-        for (int c = 0; c < INSTANCES; ++c)
-        {
-            auto position = glm::vec3(
-                posDistribution(gen),
-                posDistribution(gen),
-                posDistribution(gen)
-            );
 
-            instances.emplace_back(Instance(&triangle, position));
-            instances.at(c).Scale(glm::vec3(0.3f));
+        {
+            auto model_ptr = std::make_shared<Model>(triangle);
+
+            for (int c = 0; c < INSTANCES; ++c)
+            {
+                auto position = glm::vec3(
+                    posDistribution(gen),
+                    posDistribution(gen),
+                    posDistribution(gen)
+                );
+
+                instances.emplace_back(model_ptr, position);
+                instances.at(c).Scale(glm::vec3(0.3f));
+            }
         }
 
         /*
@@ -298,7 +285,7 @@ int main(void)
             unsigned int inst_indx = 0;
 
             /* Render here */
-            for (auto&& inst : instances)
+            for (auto& inst : instances)
             {
                 textures.at((inst_indx % 2)).Bind((inst_indx % 2));
                 shader.SetUniform1i("u_Texture", (inst_indx % 2));
@@ -311,19 +298,20 @@ int main(void)
                 inst_indx += 1;
             }
 
-            /* Swap front and back buffers */
-            glfwSwapBuffers(window);
+            if (!glfwWindowShouldClose(window))
+            {
+                /* Swap front and back buffers */
+                glfwSwapBuffers(window);
 
-            /* Poll for and process events */
-            glfwPollEvents();
-            
+                /* Poll for and process events */
+                glfwPollEvents();
+            }
         }
 
     }
     glfwTerminate();
 
-
-    std::clog << "checking for leaks.. " << std::endl;
+    std::clog << "Checking for leaks.. " << std::endl;
 
     return 0;
 }

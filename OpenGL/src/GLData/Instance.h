@@ -1,11 +1,12 @@
 #pragma once
 #include "Model.h"
 #include "glm.hpp"
+#include <memory>
 
 class Instance
 {
 private: 
-	Model* objModel;
+	std::shared_ptr<Model> objModel;
 
 	glm::mat4 mMatrix;
 
@@ -25,9 +26,9 @@ private:
 
 public:
 
-	Instance(Model* object_model, glm::vec3 position = glm::vec3(0.0f));
+	Instance(std::shared_ptr<Model> object_model, glm::vec3 position = glm::vec3(0.0f));
 
-	Model* getModel() const { return objModel; };
+	std::shared_ptr<Model> getModel() const { return objModel; };
 	glm::mat4 getModelMatrix();
 	void updateModelMatrix();
 

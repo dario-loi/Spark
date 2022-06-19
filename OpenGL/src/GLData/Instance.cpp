@@ -4,8 +4,8 @@
 #include <iostream>
 #include <gtx/string_cast.hpp>
 
-Instance::Instance(Model* object_model, glm::vec3 position)
-	: objModel(object_model), mMatrix(glm::mat4(1.0f))
+Instance::Instance(std::shared_ptr<Model> object_model, glm::vec3 position)
+	: objModel(object_model), mMatrix(1.0f)
 {
 	trans.vDisplacement.vector = position;
 	trans.vRotation.vector = glm::vec3(0.0f);
@@ -75,7 +75,8 @@ void Instance::Scale(const glm::vec3& sVec)
 
 void Instance::Draw() const
 {
-	glDrawElements(GL_TRIANGLES, objModel->getIndexSize(), GL_UNSIGNED_INT, objModel->getIndexReference());
+	glDrawElements(GL_TRIANGLES, (GLsizei)objModel->getIndexSize(), 
+					GL_UNSIGNED_INT, const_cast<GLuint*>(objModel->getIndexReference().data()));
 }
 
 

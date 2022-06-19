@@ -48,10 +48,7 @@
     <ClCompile Include="src\Controllers\RandomGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\EngineObj\Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Controllers\ModelLoader.cpp">
+    <ClCompile Include="src\Utility\Importer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,10 +83,10 @@
     <ClInclude Include="src\Controllers\RandomGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\EngineObj\Scene.h">
+    <ClInclude Include="res\vendor\OBJ_Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Controllers\ModelLoader.h">
+    <ClInclude Include="src\Utility\Importer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

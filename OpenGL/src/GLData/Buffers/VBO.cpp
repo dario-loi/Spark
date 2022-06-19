@@ -2,16 +2,13 @@
 #include "VBO.h"
 #include "GL/glew.h"
 
-VBO::VBO(std::unique_ptr<float[]> vertices, unsigned int length)
-	: size(length)
+VBO::VBO(std::vector<float>&& vertices)
+	: verts(std::move(vertices))
 {
-	this->verts = std::move(vertices);
 	glGenBuffers(1, &RenderID);
 	glBindBuffer(GL_ARRAY_BUFFER, RenderID);
-	glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), verts.get(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(float), verts.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
 }
 
 VBO::~VBO()
@@ -29,7 +26,7 @@ void VBO::Unbind() const
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VBO::setArray(std::unique_ptr<float[]> newArr)
+void VBO::setData(std::vector<float>&& newArr)
 {
 	verts = std::move(newArr);
 }

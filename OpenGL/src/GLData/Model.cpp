@@ -1,12 +1,7 @@
 #include "Model.h"
-Model::Model(std::unique_ptr<float[]> vertices, unsigned int size_vertices, std::unique_ptr<unsigned int[]> indices,
-	unsigned int size_indices)
-	: m_Vbo(std::move(vertices), size_vertices), m_Ebo(std::move(indices), size_indices), m_Vao(++Model::free_idx)
-{
-	
-}
 
-Model::~Model()
+Model::Model(std::vector<float>&& vertices, std::vector<unsigned int>&& indices)
+	: m_Vbo(std::move(vertices)), m_Ebo(std::move(indices)), m_Vao(++Model::free_idx)
 {
 }
 
@@ -41,19 +36,20 @@ EBO& Model::getEBO()
 	return m_Ebo;
 }
 
-unsigned int* Model::getIndexReference()
+std::vector<unsigned int> const& Model::getIndexReference() const
 {
 	return m_Ebo.getArray();
 }
 
-unsigned int Model::getIndexSize()
+
+size_t Model::getIndexSize() const
 {
 	return m_Ebo.getSize();
 }
 
-VBO& Model::getVBO()
+VBO const& Model::getVBO() const
 {
 	return m_Vbo;
 }
 
-long long int Model::free_idx = 0;
+size_t Model::free_idx = 0;

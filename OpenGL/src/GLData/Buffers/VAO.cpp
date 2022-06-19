@@ -3,8 +3,8 @@
 
 
 
-VAO::VAO(unsigned int index)
-	: indx(index), stride(0), RenderID(0), isBound(false)
+VAO::VAO(size_t index)
+	: RenderID(0), stride(0), indx(index), isBound(false)
 {
 
 	glGenVertexArrays(1, &RenderID);
@@ -43,12 +43,12 @@ template<>
 void VAO::add_attr<float>(unsigned int count)
 {
 
-	attributes.push_back({ count * sizeof(float), count, GL_FLOAT });
+	attributes.emplace_back(count * sizeof(float), count, GL_FLOAT);
 	stride += count * sizeof(float);
 
 }
 
-void VAO::init_VAO()
+void VAO::init_VAO() const
 {
 	int c = 0;
 	unsigned int offset = 0;
