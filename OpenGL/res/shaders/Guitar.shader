@@ -9,6 +9,8 @@ out vec3 v_Normal;
 out vec3 v_FragPos;
 
 uniform mat4 u_mMatrix;
+uniform mat3 u_nMatrix;
+
 uniform mat4 view;
 uniform mat4 projection;
 
@@ -19,9 +21,7 @@ void main()
 	v_FragPos = vec3(position);
 	v_TexCoord = vec2(text_coord.x, text_coord.y);
 
-	mat3 normal_mat = mat3(transpose(inverse(u_mMatrix)));
-
-	v_Normal = normalize(normal_mat * normal);
+	v_Normal = normalize(u_nMatrix * normal);
 }
 
 #shader fragment
@@ -36,7 +36,7 @@ uniform sampler2D u_Texture;
 uniform vec3 u_CameraPos;
 
 const float ambient_light = 0.1f;
-const vec3 sun_dir = normalize(vec3(1.0f, 0.1f, 0.0f));
+const vec3 sun_dir = normalize(vec3(0.0f, 0.1f, 1.0f));
 const vec3 sun_color = vec3(0.9f, 0.9f, 0.9f);
 
 void main()

@@ -52,8 +52,8 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
-constexpr int width = 1920;
-constexpr int height = 1080;
+constexpr int width = 480;
+constexpr int height = 360;
 
 float lastX = width / 2;
 float lastY = height / 2;
@@ -111,7 +111,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, height, "D-Engine", glfwGetPrimaryMonitor(), nullptr);
+    window = glfwCreateWindow(width, height, "D-Engine", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -169,11 +169,11 @@ int main(void)
         //Randomly gen 100 instances far away
         std::vector<Instance> instances;
 
-        constexpr const unsigned int INSTANCES = 1;
+        constexpr const unsigned int INSTANCES = 1000;
 
         instances.reserve(INSTANCES);
 
-        auto posDistribution = RandomGenerator::getRealDistribution(-10, 10);
+        auto posDistribution = RandomGenerator::getRealDistribution(-100, 100);
         auto gen = RandomGenerator::getGenerator();
 
         {
@@ -212,9 +212,6 @@ int main(void)
 
         shader.setUniform4mat("projection", cam.getProj());
 
-        instances[0].Scale({ 2.0f, 2.0f, 2.0f });
-        instances[0].Rotate({ 23.0f, 3.0f, 90.0f });
-
         auto campos = cam.getPos();
         shader.SetUniform3f("u_CameraPos", campos.x, campos.y, campos.z);
 
@@ -240,9 +237,10 @@ int main(void)
             {
                 shader.SetUniform1i("u_Texture", 0);
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
+                shader.setUniform3mat("u_nMatrix", inst.getNormalMatrix());
 
                 inst.Draw();
-                //inst.Rotate(glm::vec3(1.2f, 0.0f, 0.0f));
+                inst.Rotate(glm::vec3(1.2f, 0.0f, 0.0f));
 
                 inst_indx += 1;
             }

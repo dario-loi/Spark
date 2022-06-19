@@ -24,13 +24,22 @@ glm::mat4 Instance::getModelMatrix()
 	return mMatrix;
 }
 
+glm::mat4 Instance::getNormalMatrix()
+{
+	updateModelMatrix();
+	return nMatrix;
+}
+
 void Instance::updateModelMatrix()
 {
 	if(trans.vDisplacement.isUpdated)
 	{
 		mMatrix = glm::translate(mMatrix, trans.vDisplacement.vector);
+
 		trans.vDisplacement.isUpdated = false;
 		trans.vDisplacement.vector = glm::vec3(0.0f);
+
+		nMatrix = glm::mat3(glm::transpose(glm::inverse(mMatrix)));
 	}
 
 	if (trans.vRotation.isUpdated)
@@ -41,14 +50,19 @@ void Instance::updateModelMatrix()
 
 		trans.vRotation.isUpdated = false;
 		trans.vRotation.vector = glm::vec3(0.0f);
+
+		nMatrix = glm::mat3(glm::transpose(glm::inverse(mMatrix)));
 	}
 
 
 	if (trans.vScale.isUpdated)
 	{
 		mMatrix = glm::scale(mMatrix, trans.vScale.vector);
+
 		trans.vScale.isUpdated = false;
 		trans.vScale.vector = glm::vec3(1.0f);
+
+		nMatrix = glm::mat3(glm::transpose(glm::inverse(mMatrix)));
 	}
 
 }
