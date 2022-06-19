@@ -31,6 +31,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -72,15 +73,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>
+    </LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>
+    </LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,7 +92,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDIr)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -105,7 +109,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDIr)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <IntelJCCErratum>true</IntelJCCErratum>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,55 +129,105 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC;GLM_FORCE_DEFAULT_ALIGNED_GENTYPES;GLM_FORCE_SIMD_AVX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;$(SolutionDir)OpenGL\res\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glew32s.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\ASSIMP\lib-vc2022;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\lib\Release\x64</AdditionalLibraryDirectories>
+      <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>true</LinkStatus>
+      <TreatLinkerWarningAsErrors>
+      </TreatLinkerWarningAsErrors>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(SolutionDir)Dependencies\ASSIMP\lib-vc2022\assimp-vc142-mt.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
+      <Message>Copies dlls</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;$(SolutionDir)OpenGL\res\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <StringPooling>true</StringPooling>
+      <OpenMPSupport>true</OpenMPSupport>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <TurnOffAssemblyGeneration />
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\ASSIMP\lib-vc2022;$(SolutionDir)Dependencies\GLFW\lib-vc2022;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\lib\Release\x64</AdditionalLibraryDirectories>
+      <ShowProgress>LinkVerboseLib</ShowProgress>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glew32s.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>
+      </TreatLinkerWarningAsErrors>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(SolutionDir)Dependencies\ASSIMP\lib-vc2022\assimp-vc142-mt.dll" "$(OutDir)"
+xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
+      <Message>Copies dlls</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Controllers\RandomGenerator.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\GLData\Instance.cpp" />
+    <ClCompile Include="src\GLData\Model.cpp" />
+    <ClCompile Include="src\GLData\Buffers\EBO.cpp" />
     <ClCompile Include="res\vendor\stb_image.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\application.cpp" />
-    <ClCompile Include="src\GLData\IndexBuffer.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\GLData\VertexBuffer.cpp" />
-    <ClCompile Include="src\GLData\VertexArray.cpp" />
+    <ClCompile Include="src\GLData\Buffers\VBO.cpp" />
+    <ClCompile Include="src\GLData\Buffers\VAO.cpp" />
     <ClCompile Include="src\GLData\Texture.cpp" />
+    <ClCompile Include="src\Utility\Importer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="res\vendor\OBJ_Loader.h" />
+    <ClInclude Include="res\vendor\tiny_obj_loader.h" />
+    <ClInclude Include="src\Controllers\RandomGenerator.h" />
+    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\GLData\Instance.h" />
+    <ClInclude Include="src\GLData\Model.h" />
+    <ClInclude Include="src\GLData\Buffers\EBO.h" />
     <ClInclude Include="res\vendor\stb_image.h" />
     <ClInclude Include="src\Shader.h" />
-    <ClInclude Include="src\GLData\IndexBuffer.h" />
-    <ClInclude Include="src\Renderer.h" />
-    <ClInclude Include="src\GLData\VertexBuffer.h" />
-    <ClInclude Include="src\GLData\VertexArray.h" />
-    <ClInclude Include="src\GLData\VertexBufferLayout.h" />
+    <ClInclude Include="src\GLData\Buffers\VBO.h" />
+    <ClInclude Include="src\GLData\Buffers\VAO.h" />
     <ClInclude Include="src\GLData\Texture.h" />
+    <ClInclude Include="src\Utility\Importer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile" />
     <None Include="res\shaders\Basic.shader" />
+    <None Include="res\shaders\Guitar.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Bricks512x512.jpg" />

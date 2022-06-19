@@ -1,0 +1,52 @@
+# Blender MTL File: 'fender_04.blend'
+# Material Count: 4
+
+newmtl BodyMaterial
+Ns 407.305802
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump Body_Normal_2k.png
+map_Kd Body_Color_2k.png
+map_Ns Body_Roughness_2k.png
+
+newmtl MetalPartsMaterial
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.000000 0.595168
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd MetalParts_Color_1k.png
+map_Ns MetalParts_Roughness_1k.png
+
+newmtl NeckMaterial
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.354687 0.329283 0.204565
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump Neck_Normal_2k.png
+map_Kd Neck_Color_2k.png
+map_Ns Neck_Roughness_2k.png
+
+newmtl StringMaterial
+Ns 401.820270
+Ka 1.000000 1.000000 1.000000
+Kd 0.694644 0.694644 0.694644
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd Strings_Color_Roughness_height_64.png
+map_Ns Strings_Color_Roughness_height_64.png

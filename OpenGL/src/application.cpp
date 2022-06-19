@@ -1,15 +1,38 @@
 #include <iostream>
+#include <filesystem>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#define GLM_FORCE_MESSAGES
+#define GLM_FORCE_ALIGNED_GENTYPES
+#define GLM_FORCE_INTRINSICS 
+#define GLM_PRECISION_MEDIUMP_FLOAT
+#define GLM_PRECISION_MEDIUMP_INT
+#define GLM_PRECISION_MEDIUMP_DOUBLE
+#define GLM_PRECISION_MEDIUMP_UINT
+#include <glm.hpp>
+
+#include <vec3.hpp>
 #include <math.h>
+#include <random>
+#include <memory>
+#include <vector>
+#include <array>
+#include <time.h>
 
-#include "GLData/VertexBuffer.h"
-#include "GLData/IndexBuffer.h"
-#include "GLData/VertexArray.h"
-#include "Shader.h"
-#include "Renderer.h"
+#include "GLData/Model.h"
+#include "GLData/Buffers/VAO.h"
+#include "GLData/Instance.h"
 #include "GLData/Texture.h"
+#include "Utility/Importer.h"
 
+#include "Controllers/RandomGenerator.h"
+
+#include "Shader.h"
+#include "Camera.h"
+
+#define LOG(x) std::cerr<<x<<std::endl;
 /**
 *  \brief Callback function that defines debug behaviour. 
 *
@@ -29,6 +52,53 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
+constexpr int width = 480;
+constexpr int height = 360;
+
+float lastX = width / 2;
+float lastY = height / 2;
+
+Camera cam(1000.0f, 4 / 3, 2.5f);
+
+
+void processInput(GLFWwindow* window, Camera* camera)
+{
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->Move(camera->getViewDirection());
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->Move(-camera->getViewDirection());
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->Move(camera->getSideVector());
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->Move(-camera->getSideVector());
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera->Move(-camera->getUpDirection());
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        camera->Move(camera->getUpDirection());
+    if (glfwGetKey(window, GLFW_KEY_DELETE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera->Sprint(true);
+    else
+        camera->Sprint(false);
+}
+
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+
+    float xoffset = lastX - xpos;
+    float yoffset = ypos  - lastY;
+
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    cam.Rotate(xoffset, yoffset);
+    
+}
 
 int main(void)
 {
@@ -38,108 +108,158 @@ int main(void)
     if (!glfwInit())
         return -1;
 
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1280, 960, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(width, height, "D-Engine", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
+    //Make the window's context current
     glfwMakeContextCurrent(window);
 
     //vsync
     glfwSwapInterval(1);
 
+    //Enable MSAA
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glEnable(GL_MULTISAMPLE);
+
+    //Enable Face Culling for additional performance 
+    glEnable(GL_CULL_FACE);
+    //Enable Depth Testing
+    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_FRAMEBUFFER_SRGB);
+
+
+
+    //Enable Mouse in
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouseCallback);
+
     /* Initialize GLEW*/
 
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Error!" << std::endl;
+        std::cerr << "Error!" << std::endl;
     }
 
     /* Init GL Debugging */
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, 0);
+    glDebugMessageCallback(MessageCallback, nullptr);
 
-    /* Vertex Data*/
+    
     {
-        float position[] = {
-            -0.5f, -0.5f, 0.0f, 0.0f, //0
-             0.4f, -0.4f, 1.0f, 0.0f, //1
-             0.5f,  0.5f, 1.0f, 1.0f, //2
-            -0.4f,  0.4f, 0.0f, 1.0f  //3
-        };
+        Model guitar = importObj("res/model/ibanez-jem-guitar/source/src.obj");
 
-        GLuint indices[] = {
-
-            0,1,2,
-            2,3,0
-
-        };
-
-        /* Buffer Creation */
-           
-        unsigned int vao;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        VertexArray va;
-        VertexBuffer vb(position, 4 * 4 * sizeof(GLfloat));
-
-        VertexBufferLayout layout;
-        layout.Push<float>(2);
-        layout.Push<float>(2);
-
-        va.AddBuffer(vb, layout);
-
-        IndexBuffer ib(indices, 6);
-
-        Shader shader("res/shaders/Basic.shader");
-        shader.Bind(); 
-        shader.SetUniform4f("u_Color", 1.0f, 0.0f, 0.0f, 1.0f);
+        guitar.getVAO().add_attr<float>(3); //Position
+        guitar.getVAO().add_attr<float>(3); //Normal
+        guitar.getVAO().add_attr<float>(2); //Texture
+        guitar.ModelInit();
         
-        Texture texture("res/textures/Grass.png");
-        texture.Bind();
-        shader.SetUniform1i("u_Texture", 0);
+        /*
+            Create Instances
+        */
 
-        /* Get window metadata*/
+        //Randomly gen 100 instances far away
+        std::vector<Instance> instances;
 
-        //GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        //const GLFWvidmode* vidAttr = glfwGetVideoMode(monitor);
+        constexpr const unsigned int INSTANCES = 1000;
 
-        //std::cout << " width is " << vidAttr->width << " height is " << vidAttr->height << std::endl;
+        instances.reserve(INSTANCES);
 
-        //locate uniform addresses
+        auto posDistribution = RandomGenerator::getRealDistribution(-100, 100);
+        auto gen = RandomGenerator::getGenerator();
 
-        Renderer renderer;
+        {
+            auto model_ptr = std::make_shared<Model>(guitar);
+
+            for (int c = 0; c < INSTANCES; ++c)
+            {
+                auto position = glm::vec3(
+                    posDistribution(gen),
+                    posDistribution(gen),
+                    posDistribution(gen)
+                );
+
+                instances.emplace_back(model_ptr, position);
+                instances.at(c).Scale(glm::vec3(0.3f));
+            }
+        }
+
+        /*
+            Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
+        */
+
+        auto guitar_tex = Texture("res/model/ibanez-jem-guitar/textures/to_substance_1001_Diffuse.jpg", GL_TEXTURE_2D);
+
+        /*
+            Init Shader
+        */
+
+        Shader shader("res/shaders/Guitar.shader");
+        shader.Bind();
 
         /* Loop until the user closes the window */
+        
+        float lastFrame = 0.0f;
+        float thisFrame;
 
-        float period;
+        shader.setUniform4mat("projection", cam.getProj());
+
+        auto campos = cam.getPos();
+        shader.SetUniform3f("u_CameraPos", campos.x, campos.y, campos.z);
 
         while (!glfwWindowShouldClose(window))
         {
 
-            period = (float) abs(cos(glfwGetTime()));
-            /* Render here */
-            renderer.Clear();
+            thisFrame = glfwGetTime();
+            float deltaTime = thisFrame - lastFrame;
+            lastFrame = thisFrame;
 
-            shader.SetUniform4f("u_Color", 0.0f, 1.0f, 0.0f, 1.0f);
-            shader.SetUniform1f("u_Blend", period);
+            processInput(window, &cam);
 
-            renderer.Draw(va, ib, shader);
-
-            /* Swap front and back buffers */
-            glfwSwapBuffers(window);
-
-            /* Poll for and process events */
-            glfwPollEvents();
+            shader.setUniform4mat("view", cam.getView(deltaTime));
             
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            unsigned int inst_indx = 0;
+
+            /* Render here */
+            instances[0].getModel()->Bind();
+            guitar_tex.Bind(0);
+            for (auto& inst : instances)
+            {
+                shader.SetUniform1i("u_Texture", 0);
+                shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
+                shader.setUniform3mat("u_nMatrix", inst.getNormalMatrix());
+
+                inst.Draw();
+                inst.Rotate(glm::vec3(1.2f, 0.0f, 0.0f));
+
+                inst_indx += 1;
+            }
+            instances[0].getModel()->Unbind();
+
+            if (!glfwWindowShouldClose(window))
+            {
+                /* Swap front and back buffers */
+                glfwSwapBuffers(window);
+
+                /* Poll for and process events */
+                glfwPollEvents();
+            }
         }
+
     }
     glfwTerminate();
+
+    std::clog << "Checking for leaks.. " << std::endl;
+
     return 0;
 }
