@@ -20,8 +20,8 @@ void main()
 	gl_Position = projection * view * u_mMatrix * position;
 	v_FragPos = vec3(position);
 	v_TexCoord = vec2(text_coord.x, text_coord.y);
-
 	v_Normal = normalize(u_nMatrix * normal);
+
 }
 
 #shader fragment
@@ -49,7 +49,7 @@ void main()
 	vec3 specular = 0.5 * spec * sun_color;
 
 	vec3 ambient = ambient_light * sun_color;
-	float illumination = 2.0f * max(dot(-sun_dir, normalize(v_Normal)), 0.0f);
+	float illumination = 2.0f * max(dot(sun_dir, normalize(v_Normal)), 0.0f);
 
 	vec4 light_component = vec4(ambient + (illumination * sun_color) + specular, 1.0f);
 		
