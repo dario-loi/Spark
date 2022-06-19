@@ -57,7 +57,7 @@ void Camera::UpdateView(float delta)
 
 void Camera::Move(glm::vec3 direction)
 {
-	
+
 	isViewInvalidated = true;
 	nextMove += direction;
 }

@@ -34,6 +34,7 @@ public:
 
 	glm::mat4 getView(float delta);
 	glm::mat4 getProj() const { return proj; }
+	glm::vec3 getPos() const { return pos; }
 	float getSpeed() const { return currSpeed; }
 	void  setSpeed(float speed);
 

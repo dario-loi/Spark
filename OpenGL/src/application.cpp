@@ -52,8 +52,8 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
-constexpr int width = 1024;
-constexpr int height = 768;
+constexpr int width = 1920;
+constexpr int height = 1080;
 
 float lastX = width / 2;
 float lastY = height / 2;
@@ -111,7 +111,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, height, "D-Engine", nullptr, nullptr);
+    window = glfwCreateWindow(width, height, "D-Engine", glfwGetPrimaryMonitor(), nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -129,13 +129,12 @@ int main(void)
     glEnable(GL_MULTISAMPLE);
 
     //Enable Face Culling for additional performance 
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
-    /*
-        TODO Enable Gamma Correction (Turn on as soon as we have proper lightning processed)
-        glEnable(GL_FRAMEBUFFER_SRGB);
-    */
+
+    glEnable(GL_FRAMEBUFFER_SRGB);
+
 
 
     //Enable Mouse in
@@ -162,60 +161,6 @@ int main(void)
         guitar.getVAO().add_attr<float>(3); //Normal
         guitar.getVAO().add_attr<float>(2); //Texture
         guitar.ModelInit();
-
-        
-        ///* 
-        //    Vertex Data Initialization
-        //*/
-        //auto x = 1.0f;
-        //auto y = 1.0f;
-        //auto z = 1.0f;
-
-        //std::vector<float> vert = {         
-        //    -x, -y, -z, // 0 
-        //     x, -y, -z, // 1
-        //     x,  y, -z, // 2
-        //    -x,  y, -z, // 3
-        //    -x, -y,  z, // 4
-        //     x, -y,  z, // 5
-        //     x,  y,  z, // 6
-        //    -x,  y,  z  // 7
-        //};
-
-
-        //std::vector<unsigned int> indx = {
-        //        4, 5, 6, //z+ front
-        //        4, 6, 7,
-
-        //        7, 3, 0, //x+ right
-        //        0, 4, 7,
-
-        //        7, 6, 2, //y+ top
-        //        2, 3, 7,
-
-        //        6, 5, 1, //x- left
-        //        2, 6, 1,
-
-        //        1, 5, 4, //y- bottom
-        //        0, 1, 4,
-
-        //        2, 1, 0, //z- back
-        //        3, 2, 0
-
-        //};
-
-
-        //
-        ///*
-        //    Create Model
-        //*/
-        //
-        //Model triangle(std::move(vert), std::move(indx));
-        //triangle.getVAO().add_attr<float>(3);
-        //triangle.ModelInit();
-
-        //triangle.Bind();
-
         
         /*
             Create Instances
@@ -268,8 +213,10 @@ int main(void)
         shader.setUniform4mat("projection", cam.getProj());
 
         instances[0].Scale({ 2.0f, 2.0f, 2.0f });
-        instances[0].Rotate({ 90.0f, 0.0f, 0.0f });
+        instances[0].Rotate({ 23.0f, 3.0f, 90.0f });
 
+        auto campos = cam.getPos();
+        shader.SetUniform3f("u_CameraPos", campos.x, campos.y, campos.z);
 
         while (!glfwWindowShouldClose(window))
         {
@@ -292,11 +239,10 @@ int main(void)
             for (auto& inst : instances)
             {
                 shader.SetUniform1i("u_Texture", 0);
-                
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
 
                 inst.Draw();
-                //inst.Rotate(glm::vec3(0.2f, 1.0f, 0.4f));
+                //inst.Rotate(glm::vec3(1.2f, 0.0f, 0.0f));
 
                 inst_indx += 1;
             }
