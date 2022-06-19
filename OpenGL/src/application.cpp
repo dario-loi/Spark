@@ -129,7 +129,7 @@ int main(void)
     glEnable(GL_MULTISAMPLE);
 
     //Enable Face Culling for additional performance 
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
     /*
@@ -156,7 +156,7 @@ int main(void)
 
     
     {
-        Model guitar = importObj("res/model/ibanez-jem-guitar/source/model.obj");
+        Model guitar = importObj("res/model/ibanez-jem-guitar/source/src.obj");
 
         guitar.getVAO().add_attr<float>(3); //Position
         guitar.getVAO().add_attr<float>(3); //Normal
@@ -266,6 +266,10 @@ int main(void)
         float thisFrame;
 
         shader.setUniform4mat("projection", cam.getProj());
+
+        instances[0].Scale({ 2.0f, 2.0f, 2.0f });
+        instances[0].Rotate({ 90.0f, 0.0f, 0.0f });
+
 
         while (!glfwWindowShouldClose(window))
         {
