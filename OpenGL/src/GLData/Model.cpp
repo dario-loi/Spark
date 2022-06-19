@@ -5,6 +5,10 @@ Model::Model(std::vector<float>&& vertices, std::vector<unsigned int>&& indices)
 {
 }
 
+Model::~Model() = default;
+
+
+
 void Model::Bind()
 {
 	m_Vbo.Bind();
@@ -42,9 +46,22 @@ std::vector<unsigned int> const& Model::getIndexReference() const
 }
 
 
+std::vector<float> const& Model::getBufferReference() const
+{
+	return m_Vbo.getArray();
+}
+
+
+
+
 size_t Model::getIndexSize() const
 {
 	return m_Ebo.getSize();
+}
+
+size_t Model::getBufferSize() const
+{
+	return m_Vbo.getSize();
 }
 
 VBO const& Model::getVBO() const

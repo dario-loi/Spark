@@ -21,6 +21,7 @@ public:
 	unsigned int getRenderID() const { return RenderID; }
 
 	size_t getSize() const { return verts.size(); }
+	std::vector<float> const& getArray() const { return verts; }
 
 	std::vector<float> const& getData() const { return verts; }
 

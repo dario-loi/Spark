@@ -129,7 +129,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC;GLM_FORCE_DEFAULT_ALIGNED_GENTYPES;GLM_FORCE_SIMD_AVX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -155,7 +155,7 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -196,7 +196,6 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Utility\Importer.cpp" />
     <ClCompile Include="src\Controllers\RandomGenerator.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\GLData\Instance.cpp" />
@@ -208,10 +207,11 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\GLData\Buffers\VBO.cpp" />
     <ClCompile Include="src\GLData\Buffers\VAO.cpp" />
     <ClCompile Include="src\GLData\Texture.cpp" />
+    <ClCompile Include="src\Utility\Importer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Utility\Importer.h" />
     <ClInclude Include="res\vendor\OBJ_Loader.h" />
+    <ClInclude Include="res\vendor\tiny_obj_loader.h" />
     <ClInclude Include="src\Controllers\RandomGenerator.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\GLData\Instance.h" />
@@ -222,10 +222,12 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\GLData\Buffers\VBO.h" />
     <ClInclude Include="src\GLData\Buffers\VAO.h" />
     <ClInclude Include="src\GLData\Texture.h" />
+    <ClInclude Include="src\Utility\Importer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile" />
     <None Include="res\shaders\Basic.shader" />
+    <None Include="res\shaders\Guitar.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Bricks512x512.jpg" />

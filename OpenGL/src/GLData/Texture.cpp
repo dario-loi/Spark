@@ -89,8 +89,7 @@ void Texture::initTexture() const
 
 void Texture::Bind(unsigned int channel) const
 {
-	int TexSlot = GL_TEXTURE0 + channel;
-	if (TexSlot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
+	if (int TexSlot = GL_TEXTURE0 + channel; TexSlot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
 	{
 		glActiveTexture(TexSlot);
 	}

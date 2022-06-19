@@ -59,7 +59,7 @@ float lastX = width / 2;
 float lastY = height / 2;
 
 Camera cam(1000.0f, 4 / 3, 2.5f);
-objl::Loader loader;
+
 
 void processInput(GLFWwindow* window, Camera* camera)
 {
@@ -156,63 +156,67 @@ int main(void)
 
     
     {
-    
+        Model guitar = importObj("res/model/ibanez-jem-guitar/source/model.obj");
 
-        std::cout << std::filesystem::current_path();
-
-
-        /* 
-            Vertex Data Initialization
-        */
-        auto x = 1.0f;
-        auto y = 1.0f;
-        auto z = 1.0f;
-
-        std::vector<float> vert = {         
-            -x, -y, -z, // 0 
-             x, -y, -z, // 1
-             x,  y, -z, // 2
-            -x,  y, -z, // 3
-            -x, -y,  z, // 4
-             x, -y,  z, // 5
-             x,  y,  z, // 6
-            -x,  y,  z  // 7
-        };
-
-
-        std::vector<unsigned int> indx = {
-                4, 5, 6, //z+ front
-                4, 6, 7,
-
-                7, 3, 0, //x+ right
-                0, 4, 7,
-
-                7, 6, 2, //y+ top
-                2, 3, 7,
-
-                6, 5, 1, //x- left
-                2, 6, 1,
-
-                1, 5, 4, //y- bottom
-                0, 1, 4,
-
-                2, 1, 0, //z- back
-                3, 2, 0
-
-        };
-
+        guitar.getVAO().add_attr<float>(3); //Position
+        guitar.getVAO().add_attr<float>(3); //Normal
+        guitar.getVAO().add_attr<float>(2); //Texture
+        guitar.ModelInit();
 
         
-        /*
-            Create Model
-        */
+        ///* 
+        //    Vertex Data Initialization
+        //*/
+        //auto x = 1.0f;
+        //auto y = 1.0f;
+        //auto z = 1.0f;
+
+        //std::vector<float> vert = {         
+        //    -x, -y, -z, // 0 
+        //     x, -y, -z, // 1
+        //     x,  y, -z, // 2
+        //    -x,  y, -z, // 3
+        //    -x, -y,  z, // 4
+        //     x, -y,  z, // 5
+        //     x,  y,  z, // 6
+        //    -x,  y,  z  // 7
+        //};
+
+
+        //std::vector<unsigned int> indx = {
+        //        4, 5, 6, //z+ front
+        //        4, 6, 7,
+
+        //        7, 3, 0, //x+ right
+        //        0, 4, 7,
+
+        //        7, 6, 2, //y+ top
+        //        2, 3, 7,
+
+        //        6, 5, 1, //x- left
+        //        2, 6, 1,
+
+        //        1, 5, 4, //y- bottom
+        //        0, 1, 4,
+
+        //        2, 1, 0, //z- back
+        //        3, 2, 0
+
+        //};
+
+
+        //
+        ///*
+        //    Create Model
+        //*/
+        //
+        //Model triangle(std::move(vert), std::move(indx));
+        //triangle.getVAO().add_attr<float>(3);
+        //triangle.ModelInit();
+
+        //triangle.Bind();
+
         
-        Model triangle(std::move(vert), std::move(indx));
-        triangle.getVAO().add_attr<float>(3);
-        triangle.ModelInit();
-
-        triangle.Bind();
-
         /*
             Create Instances
         */
@@ -220,7 +224,7 @@ int main(void)
         //Randomly gen 100 instances far away
         std::vector<Instance> instances;
 
-        constexpr const unsigned int INSTANCES = 20000;
+        constexpr const unsigned int INSTANCES = 1;
 
         instances.reserve(INSTANCES);
 
@@ -228,7 +232,7 @@ int main(void)
         auto gen = RandomGenerator::getGenerator();
 
         {
-            auto model_ptr = std::make_shared<Model>(triangle);
+            auto model_ptr = std::make_shared<Model>(guitar);
 
             for (int c = 0; c < INSTANCES; ++c)
             {
@@ -247,18 +251,13 @@ int main(void)
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
         */
 
-        std::array<Texture, 2> textures{
-            {
-                Texture("res/textures/Grass.png", GL_TEXTURE_CUBE_MAP),
-                Texture("res/textures/Bricks512x512.jpg", GL_TEXTURE_CUBE_MAP)
-            }
-        };
+        auto guitar_tex = Texture("res/model/ibanez-jem-guitar/textures/to_substance_1001_Diffuse.jpg", GL_TEXTURE_2D);
 
         /*
             Init Shader
         */
 
-        Shader shader("res/shaders/Basic.shader");
+        Shader shader("res/shaders/Guitar.shader");
         shader.Bind();
 
         /* Loop until the user closes the window */
@@ -277,7 +276,6 @@ int main(void)
 
             processInput(window, &cam);
 
-
             shader.setUniform4mat("view", cam.getView(deltaTime));
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -285,18 +283,20 @@ int main(void)
             unsigned int inst_indx = 0;
 
             /* Render here */
+            instances[0].getModel()->Bind();
+            guitar_tex.Bind(0);
             for (auto& inst : instances)
             {
-                textures.at((inst_indx % 2)).Bind((inst_indx % 2));
-                shader.SetUniform1i("u_Texture", (inst_indx % 2));
+                shader.SetUniform1i("u_Texture", 0);
                 
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
 
                 inst.Draw();
-                inst.Rotate(glm::vec3(0.2f, 1.0f, 0.4f));
+                //inst.Rotate(glm::vec3(0.2f, 1.0f, 0.4f));
 
                 inst_indx += 1;
             }
+            instances[0].getModel()->Unbind();
 
             if (!glfwWindowShouldClose(window))
             {

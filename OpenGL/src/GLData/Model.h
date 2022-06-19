@@ -2,8 +2,6 @@
 #include "Buffers/EBO.h"
 #include "Buffers/VAO.h"
 #include "Buffers/VBO.h"
-#include "..\Utility\Importer.h"
-
 
 class Model
 {
@@ -25,7 +23,9 @@ public:
 	VAO& getVAO();
 	EBO& getEBO();
 	std::vector<unsigned int> const& getIndexReference() const;
+	std::vector<float> const& getBufferReference() const;
 	size_t  getIndexSize() const;
+	size_t getBufferSize() const;
 	VBO const& getVBO() const; 
 
 	static size_t free_idx;
