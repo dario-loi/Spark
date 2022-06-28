@@ -15,13 +15,13 @@ uniform mat3 u_normalMatrix;
 uniform mat4 view;
 uniform mat4 projection;
 
-const vec3 sunDir = normalize(vec3(0.1f, -1.0f, -0.1f));
+const vec3 sunDir = normalize(vec3(0.4f, -1.0f, -0.1f));
 
 void main()
 {
 	
 	//Normalize + Translate Normals
-	v_Normal = normalize(mat3(u_mMatrix) * normalize(normal));
+	v_Normal = normalize(transpose(inverse(mat3(u_mMatrix))) * normalize(normal));
 
 	//Texture Coordinates Passthrough
 	v_TexCoord = text_coord;
@@ -45,9 +45,10 @@ in vec3 curr_pos;
 flat in vec3 light_dir;
 
 uniform sampler2D u_Texture;
+uniform sampler2D u_Specular;
 uniform vec3 u_CameraPos;
 
-const float ambient_light = 0.1f;
+const float ambient_light = 0.2f;
 const float specular_light = 2.5f;
 const vec3 ambient_color = vec3(60 / 255, 65 / 255, 106 / 255);
 
@@ -67,12 +68,12 @@ void main()
 	vec3 ambient = ambient_light * ambient_color;
 
 	//Specular
-	
+	vec3 spec_amount = texture(u_Texture, v_TexCoord).xyz;
 
 	vec3 view_dir = normalize(u_CameraPos - curr_pos);
 	vec3 reflect_dir = reflect(-light_dir, v_Normal);
 	float spec = pow(max(dot(view_dir, reflect_dir), 0.0f), 32);
-	vec3 specular = specular_light * spec * sun_color;
+	vec3 specular = spec_amount * specular_light * spec * sun_color;
 
 	color = vec4(tex_col.rgb * (ambient + diffuse + specular), 1.0f);
 }
