@@ -5,8 +5,8 @@
 
 #include "..\..\res\vendor\stb_image.h"
 
-Texture::Texture(std::string const& filename, const GLenum texType)
-	: RenderID(0), currChannel(0),  imgWidth(0), imgHeight(0), BitDepth(4), texType(texType)
+Texture::Texture(std::string const& filename, const GLenum texType, const GLenum texEnc)
+	: RenderID(0), currChannel(0),  imgWidth(0), imgHeight(0), BitDepth(4), texType(texType), texEnc(texEnc)
 {
 
 	stbi_set_flip_vertically_on_load(1);
@@ -55,7 +55,7 @@ void Texture::initTexture() const
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, texEnc, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
 
 		glGenerateMipmap(texType);
 		break;
@@ -73,7 +73,7 @@ void Texture::initTexture() const
 		{
 			std::cerr << "Currently processing face number: " << face << std::endl;
 			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, GL_SRGB8_ALPHA8, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, texEnc, imgWidth, imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer
 			);
 		}
 

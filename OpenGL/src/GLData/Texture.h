@@ -2,12 +2,14 @@
 #include <string>
 #include "GL/glew.h"
 
+
+
 class Texture
 {
 
 public:
 
-	Texture(const std::string& filename, const GLenum texType);
+	Texture(const std::string& filename, const GLenum texType, const GLenum texEnc);
 	~Texture();
 	void Bind(unsigned int channel) const;
 	void Unbind() const;
@@ -20,7 +22,8 @@ private:
 	int imgWidth;
 	int imgHeight;
 	int BitDepth;
-	GLenum texType;
+	const GLenum texType;
+	const GLenum texEnc;
 
 	void initTexture() const;
 };

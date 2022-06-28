@@ -201,8 +201,8 @@ int main(void)
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
         */
 
-        auto guitar_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D);
-        auto guitar_spec = Texture("res/model/robot/textures/specular.jpeg", GL_TEXTURE_2D);
+        auto guitar_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        auto guitar_spec = Texture("res/model/robot/textures/specular.jpeg", GL_TEXTURE_2D, GL_RGBA8);
 
         /*
             Init Shader
