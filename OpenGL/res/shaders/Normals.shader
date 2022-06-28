@@ -15,7 +15,7 @@ uniform mat3 u_normalMatrix;
 uniform mat4 view;
 uniform mat4 projection;
 
-const vec3 sunDir = normalize(vec3(0.1f, -1.0f, -0.1f));
+const vec3 sunDir = normalize(vec3(0.0f, -1.0f, 0.0f));
 
 void main()
 {
@@ -47,32 +47,7 @@ flat in vec3 light_dir;
 uniform sampler2D u_Texture;
 uniform vec3 u_CameraPos;
 
-const float ambient_light = 0.1f;
-const float specular_light = 2.5f;
-const vec3 ambient_color = vec3(60 / 255, 65 / 255, 106 / 255);
-
-const vec3 sun_color = vec3(0.4314f, 0.5255f, 0.9412f);
-
 void main()
 {	
-
-
-	//Texture Color
-	vec4 tex_col = texture(u_Texture, v_TexCoord);
-
-	//Diffuse
-	vec3 diffuse = max(dot(v_Normal, light_dir), 0.0f) * sun_color;
-
-	//Ambient Light
-	vec3 ambient = ambient_light * ambient_color;
-
-	//Specular
-	
-
-	vec3 view_dir = normalize(u_CameraPos - curr_pos);
-	vec3 reflect_dir = reflect(-light_dir, v_Normal);
-	float spec = pow(max(dot(view_dir, reflect_dir), 0.0f), 32);
-	vec3 specular = specular_light * spec * sun_color;
-
-	color = vec4(tex_col.rgb * (ambient + diffuse + specular), 1.0f);
+	color = vec4(v_Normal, 1.0f);
 }

@@ -97,6 +97,7 @@
     <None Include="Doxyfile" />
     <None Include="res\shaders\Basic.shader" />
     <None Include="res\shaders\Guitar.shader" />
+    <None Include="res\shaders\Normals.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Grass.png">

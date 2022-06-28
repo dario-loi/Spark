@@ -19,6 +19,7 @@
 #include <memory>
 #include <vector>
 #include <array>
+
 #include <time.h>
 
 #include "GLData/Model.h"
@@ -52,13 +53,14 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
-constexpr int width = 1920;
-constexpr int height = 1080;
+constexpr int width = 1280;
+constexpr int height = 720;
 
 float lastX = width / 2;
 float lastY = height / 2;
 
 Camera cam(1000.0f, 4 / 3, 2.5f);
+
 
 
 void processInput(GLFWwindow* window, Camera* camera)
@@ -111,7 +113,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, height, "D-Engine", glfwGetPrimaryMonitor(), nullptr);
+    window = glfwCreateWindow(width, height, "D-Engine", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -155,8 +157,8 @@ int main(void)
 
     
     {
-        Model guitar = importObj("res/model/ibanez-jem-guitar/source/src.obj");
-
+        Model guitar = importObj("res/model/robot/source/robot.obj");
+            
         guitar.getVAO().add_attr<float>(3); //Position
         guitar.getVAO().add_attr<float>(3); //Normal
         guitar.getVAO().add_attr<float>(2); //Texture
@@ -169,11 +171,12 @@ int main(void)
         //Randomly gen 100 instances far away
         std::vector<Instance> instances;
 
-        constexpr const unsigned int INSTANCES = 3;
+        constexpr const unsigned int INSTANCES = 1;
 
         instances.reserve(INSTANCES);
 
         auto posDistribution = RandomGenerator::getRealDistribution(-10, 10);
+        auto rotDistribution = RandomGenerator::getRealDistribution(-180, 180);
         auto gen = RandomGenerator::getGenerator();
 
         {
@@ -186,9 +189,16 @@ int main(void)
                     posDistribution(gen),
                     posDistribution(gen)
                 );
+                
+                /*auto rotation = glm::vec3(
+                    rotDistribution(gen),
+                    rotDistribution(gen),
+                    rotDistribution(gen)
+                );*/
 
                 instances.emplace_back(model_ptr, position);
-                instances.at(c).Scale(glm::vec3(0.3f));
+                instances.at(c).Rotate(glm::vec3(180.0f, 0.0f, 0.0f));
+                instances.at(c).Scale(glm::vec3(0.5f));
             }
         }
 
@@ -196,13 +206,16 @@ int main(void)
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
         */
 
-        auto guitar_tex = Texture("res/model/ibanez-jem-guitar/textures/to_substance_1001_Diffuse.jpg", GL_TEXTURE_2D);
+        auto guitar_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D);
 
         /*
             Init Shader
         */
 
-        Shader shader("res/shaders/Guitar.shader");
+        unsigned int current_shader = 1;
+        auto shader = Shader("res/shaders/Guitar.shader");
+
+        
         shader.Bind();
 
         /* Loop until the user closes the window */
@@ -212,12 +225,9 @@ int main(void)
 
         shader.setUniform4mat("projection", cam.getProj());
 
-        auto campos = cam.getPos();
-        shader.SetUniform3f("u_CameraPos", campos.x, campos.y, campos.z);
-
         while (!glfwWindowShouldClose(window))
         {
-
+            
             thisFrame = glfwGetTime();
             float deltaTime = thisFrame - lastFrame;
             lastFrame = thisFrame;
@@ -225,6 +235,7 @@ int main(void)
             processInput(window, &cam);
 
             shader.setUniform4mat("view", cam.getView(deltaTime));
+            shader.SetUniform3f("u_CameraPos", cam.getPos());
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -237,10 +248,11 @@ int main(void)
             {
                 shader.SetUniform1i("u_Texture", 0);
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
-                shader.setUniform3mat("u_nMatrix", inst.getNormalMatrix());
+                shader.setUniform3mat("u_normalMatrix", 
+                    glm::transpose(glm::inverse( glm::mat3(cam.getView(deltaTime) * inst.getModelMatrix()))
+                    ));
 
                 inst.Draw();
-                inst.Rotate(glm::vec3(1.5f, 0.0f, 0.0f));
 
                 inst_indx += 1;
             }

@@ -9,7 +9,7 @@ private:
 	std::shared_ptr<Model> objModel;
 
 	glm::mat4 mMatrix;
-	glm::mat4 nMatrix;
+	glm::mat3 nMatrix;
 
 	struct TransformElement
 	{
@@ -31,7 +31,7 @@ public:
 
 	std::shared_ptr<Model> getModel() const { return objModel; };
 	glm::mat4 getModelMatrix();
-	glm::mat4 getNormalMatrix();
+	glm::mat3 getNormalMatrix();
 	void updateModelMatrix();
 
 	Transform getTransform() const { return trans; }

@@ -11,6 +11,7 @@ Shader::Shader(const std::string& filepath)
 
 Shader::~Shader()
 {
+    std::clog << "Destructed Shader!" << std::endl;
     glDeleteProgram(m_RendererID);
 }
 
@@ -69,6 +70,7 @@ GLuint Shader::CompileShader(GLuint type,
 
         std::cout << message << std::endl;
         glDeleteShader(id);
+        assert(false);
         return 0;
     }
 
@@ -118,6 +120,11 @@ void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2,
 void Shader::SetUniform3f(const std::string& name, float v0, float v1, float v2)
 {
     glUniform3f(GetUniformLocation(name), v0, v1, v2);
+}
+
+void Shader::SetUniform3f(const std::string& name, glm::vec3 v)
+{
+    glUniform3f(GetUniformLocation(name), v.x, v.y, v.z);
 }
 
 void Shader::setUniform4mat(const std::string& name, const glm::mat4& matrix)
