@@ -71,19 +71,19 @@ void Instance::updateModelMatrix()
 
 void Instance::Move(const glm::vec3& dVec)
 {
-	trans.vDisplacement.vector = dVec;
+	trans.vDisplacement.vector += dVec;
 	trans.vDisplacement.isUpdated = true;
 }
 
 void Instance::Rotate(const glm::vec3& rVec)
 {
-	trans.vRotation.vector = rVec;
+	trans.vRotation.vector += rVec;
 	trans.vRotation.isUpdated = true;
 }
 
 void Instance::Scale(const glm::vec3& sVec)
 {
-	trans.vScale.vector = sVec;
+	trans.vScale.vector *= sVec;
 	trans.vScale.isUpdated = true;
 }
 

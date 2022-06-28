@@ -48,16 +48,14 @@ uniform sampler2D u_Texture;
 uniform sampler2D u_Specular;
 uniform vec3 u_CameraPos;
 
-const float ambient_light = 0.2f;
-const float specular_light = 2.5f;
+const float ambient_light = 0.25f;
+const float specular_light = 5.0f;
 const vec3 ambient_color = vec3(60 / 255, 65 / 255, 106 / 255);
 
 const vec3 sun_color = vec3(0.4314f, 0.5255f, 0.9412f);
 
 void main()
 {	
-
-
 	//Texture Color
 	vec4 tex_col = texture(u_Texture, v_TexCoord);
 
@@ -68,12 +66,15 @@ void main()
 	vec3 ambient = ambient_light * ambient_color;
 
 	//Specular
-	vec3 spec_amount = texture(u_Texture, v_TexCoord).xyz;
-
 	vec3 view_dir = normalize(u_CameraPos - curr_pos);
-	vec3 reflect_dir = reflect(-light_dir, v_Normal);
-	float spec = pow(max(dot(view_dir, reflect_dir), 0.0f), 32);
-	vec3 specular = spec_amount * specular_light * spec * sun_color;
 
+	vec3 halfway = normalize(light_dir + view_dir);
+
+	float spec = pow(max(dot(halfway, v_Normal), 0.0f), 128);
+
+	if (diffuse == 0.0f)
+		spec = 0.0f;
+
+	vec3 specular = specular_light * spec * sun_color;
 	color = vec4(tex_col.rgb * (ambient + diffuse + specular), 1.0f);
 }

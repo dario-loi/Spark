@@ -135,6 +135,7 @@ int main(void)
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
 
+    //Gamma Correction
     glEnable(GL_FRAMEBUFFER_SRGB);
 
 
@@ -168,7 +169,7 @@ int main(void)
             Create Instances
         */
 
-        //Randomly gen 100 instances far away
+        //Randomly gen INSTANCES instances
         std::vector<Instance> instances;
 
         constexpr const unsigned int INSTANCES = 1;
@@ -189,12 +190,6 @@ int main(void)
                     posDistribution(gen),
                     posDistribution(gen)
                 );
-                
-                /*auto rotation = glm::vec3(
-                    rotDistribution(gen),
-                    rotDistribution(gen),
-                    rotDistribution(gen)
-                );*/
 
                 instances.emplace_back(model_ptr, position);
                 instances.at(c).Rotate(glm::vec3(180.0f, 0.0f, 0.0f));
@@ -213,9 +208,7 @@ int main(void)
             Init Shader
         */
 
-        unsigned int current_shader = 1;
         auto shader = Shader("res/shaders/Guitar.shader");
-
         
         shader.Bind();
 
@@ -248,6 +241,8 @@ int main(void)
             guitar_spec.Bind(1);
             for (auto& inst : instances)
             {
+                inst.Rotate(glm::vec3(0.0f, 0.1f, 0.0f));
+
                 shader.SetUniform1i("u_Texture", 0);
                 shader.SetUniform1i("u_Specular", 1);
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
