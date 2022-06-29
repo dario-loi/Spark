@@ -202,7 +202,6 @@ int main(void)
         */
 
         auto guitar_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
-        auto guitar_spec = Texture("res/model/robot/textures/specular.jpeg", GL_TEXTURE_2D, GL_RGBA8);
 
         /*
             Init Shader
@@ -238,13 +237,11 @@ int main(void)
             /* Render here */
             instances[0].getModel()->Bind();
             guitar_tex.Bind(0);
-            guitar_spec.Bind(1);
             for (auto& inst : instances)
             {
                 inst.Rotate(glm::vec3(0.0f, 0.1f, 0.0f));
 
                 shader.SetUniform1i("u_Texture", 0);
-                shader.SetUniform1i("u_Specular", 1);
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
                 shader.setUniform3mat("u_normalMatrix", inst.getNormalMatrix());
 

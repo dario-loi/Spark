@@ -21,7 +21,7 @@ void main()
 {
 	
 	//Normalize + Translate Normals
-	v_Normal = normalize(transpose(inverse(mat3(u_mMatrix))) * normalize(normal));
+	v_Normal = u_normalMatrix * normalize(normal);
 
 	//Texture Coordinates Passthrough
 	v_TexCoord = text_coord;
@@ -45,11 +45,10 @@ in vec3 curr_pos;
 flat in vec3 light_dir;
 
 uniform sampler2D u_Texture;
-uniform sampler2D u_Specular;
 uniform vec3 u_CameraPos;
 
-const float ambient_light = 0.25f;
-const float specular_light = 5.0f;
+const float ambient_light = 0.5f;
+const float specular_light = 2.5f;
 const vec3 ambient_color = vec3(60 / 255, 65 / 255, 106 / 255);
 
 const vec3 sun_color = vec3(0.4314f, 0.5255f, 0.9412f);
@@ -57,10 +56,11 @@ const vec3 sun_color = vec3(0.4314f, 0.5255f, 0.9412f);
 void main()
 {	
 	//Texture Color
-	vec4 tex_col = texture(u_Texture, v_TexCoord);
+	vec3 norm = normalize(v_Normal);
+	vec3 tex_col = texture(u_Texture, v_TexCoord).rgb;
 
 	//Diffuse
-	vec3 diffuse = max(dot(v_Normal, light_dir), 0.0f) * sun_color;
+	vec3 diffuse = max(dot(norm, light_dir), 0.0f) * sun_color;
 
 	//Ambient Light
 	vec3 ambient = ambient_light * ambient_color;
@@ -70,11 +70,11 @@ void main()
 
 	vec3 halfway = normalize(light_dir + view_dir);
 
-	float spec = pow(max(dot(halfway, v_Normal), 0.0f), 128);
+	float spec = pow(max(dot(halfway, norm), 0.0f), 128);
 
 	if (diffuse == 0.0f)
 		spec = 0.0f;
 
-	vec3 specular = specular_light * spec * sun_color;
-	color = vec4(tex_col.rgb * (ambient + diffuse + specular), 1.0f);
+	vec3 specular = sun_color * specular_light * spec;
+	color = vec4(tex_col * (ambient + diffuse + specular), 1.0f);
 }
