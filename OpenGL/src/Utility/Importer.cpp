@@ -37,18 +37,20 @@ Model importObj(std::string const& filename)
     {
         for (auto const& indx : shape.mesh.indices)
         {
+            
             for(unsigned int i = 0; i < 3; ++i)
             {
-                raw_verts.push_back(attributes.vertices[3 * indx.vertex_index + i]);
+                raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + i]);
             }
             for (unsigned int i = 0; i < 3; ++i)
             {
-                raw_verts.push_back(attributes.normals[3 * indx.normal_index + i]);
+                raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index + i]);
             }
             for (unsigned int i = 0; i < 2; ++i)
             {
-                raw_verts.push_back(attributes.texcoords[2 * indx.texcoord_index + i]);
+                raw_verts.emplace_back(attributes.texcoords[2ui64 * indx.texcoord_index + i]);
             }
+
             glm::vec3 position = {
                 attributes.vertices[3ui64 * indx.vertex_index],
                 attributes.vertices[3ui64 * indx.vertex_index + 1ui64],
@@ -57,9 +59,24 @@ Model importObj(std::string const& filename)
 
             if (!uniqueVertices.contains(position)) {
                 uniqueVertices[position] = static_cast<uint32_t>((raw_verts.size()/8) - 1);
+                indices.emplace_back(uniqueVertices[position]);
             }
+            else
+            {
 
-            indices.push_back(uniqueVertices[position]);
+                std::vector<float> v1(std::next(raw_verts.end(), -8), raw_verts.end());
+                std::vector<float> v2(std::next(raw_verts.begin(), uniqueVertices[position] * 8), std::next(raw_verts.begin(), 8 + uniqueVertices[position] * 8));
+
+                if (v1 == v2)
+                {
+                    indices.emplace_back(uniqueVertices[position]);
+                }
+                else
+                {
+                    indices.emplace_back(static_cast<unsigned int>((raw_verts.size() / 8) - 1));
+                }
+
+            }
         }
     }
 
