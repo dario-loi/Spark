@@ -207,7 +207,9 @@ int main(void)
 
         std::vector<Instance> lights;
 
-        for (size_t i = 0; i < 127; ++i)
+        const constexpr unsigned int NUM_LIGHTS = 2;
+
+        for (size_t i = 0; i < NUM_LIGHTS; ++i)
         {
             lights.push_back({ std::make_shared<Model>(cube), { 1.0f + i, 1.0f, 2.0f } });
         }
@@ -246,11 +248,9 @@ int main(void)
 
 #endif // _DEBUG
 
-        
 
         std::cout << light_positions.getSize() << std::endl;
         
-
         /* Loop until the user closes the window */
         
         float lastFrame = 0.0f;

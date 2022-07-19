@@ -42,9 +42,13 @@ public:
 
 	Transform getTransform() const { return trans; }
 
-	void Move(const glm::vec3& dVec);
-	void Rotate(const glm::vec3& rVec);
-	void Scale(const glm::vec3& sVec);
+	void Move(glm::vec3 const& dVec);
+	void Rotate(glm::vec3 const& rVec);
+	void Scale(glm::vec3 const& sVec);
+
+	void setPos(glm::vec3 const& dVec);
+	void setRot(glm::vec3 const& rVec);
+	void setScale(glm::vec3 const& sVec);
 
 	void Draw() const;
 };

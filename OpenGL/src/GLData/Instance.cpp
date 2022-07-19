@@ -1,3 +1,4 @@
+#define PRINT_MATRICES false
 
 #include "Instance.h"
 #include "ext/matrix_transform.hpp"
@@ -43,37 +44,34 @@ void Instance::updateModelMatrix()
 	{
 		if(trans.vDisplacement.isUpdated)
 		{
-			displacement = glm::translate(displacement, trans.vDisplacement.vector);
+			displacement = glm::translate(glm::identity<glm::mat4>(), trans.vDisplacement.vector);
 
 			trans.vDisplacement.isUpdated = false;
-			trans.vDisplacement.vector = glm::vec3(0.0f);
 
 		}
 
 		if (trans.vRotation.isUpdated)
 		{
-			rotation = glm::rotate(rotation, glm::radians(trans.vRotation.vector.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			rotation = glm::rotate(glm::identity<glm::mat4>(), glm::radians(trans.vRotation.vector.x), glm::vec3(1.0f, 0.0f, 0.0f));
 			rotation = glm::rotate(rotation, glm::radians(trans.vRotation.vector.y), glm::vec3(0.0f, 1.0f, 0.0f));
 			rotation = glm::rotate(rotation, glm::radians(trans.vRotation.vector.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 			trans.vRotation.isUpdated = false;
-			trans.vRotation.vector = glm::vec3(0.0f);
 
 		}
 
 		if (trans.vScale.isUpdated)
 		{
-			scaling = glm::scale(scaling, trans.vScale.vector);
+			scaling = glm::scale(glm::identity<glm::mat4>(), trans.vScale.vector);
 
 			trans.vScale.isUpdated = false;
-			trans.vScale.vector = glm::vec3(1.0f);
 
 		}
 
-		mMatrix = displacement * (rotation * (scaling * glm::identity<glm::mat4>()));
+		mMatrix = displacement * (rotation * (scaling));
 		nMatrix = glm::transpose(glm::inverse(glm::mat3(mMatrix)));
 		
-#ifdef _DEBUG
+#if defined(_DEBUG) && PRINT_MATRICES
 		std::cout << glm::to_string(rotation) << std::endl;
 		std::cout << glm::to_string(mMatrix) << std::endl;
 		std::cout << glm::to_string(nMatrix) << std::endl;
@@ -105,6 +103,24 @@ void Instance::Draw() const
 
 	glDrawElements(GL_TRIANGLES, (GLsizei)objModel->getIndexSize(), 
 					GL_UNSIGNED_INT, const_cast<GLuint*>(objModel->getIndexReference().data()));
+}
+
+void Instance::setPos(const glm::vec3& dVec)
+{
+	trans.vDisplacement.vector = dVec;
+	trans.vDisplacement.isUpdated = true;
+}
+
+void Instance::setRot(glm::vec3 const& rVec)
+{
+	trans.vRotation.vector = rVec;
+	trans.vRotation.isUpdated = true;
+}
+
+void Instance::setScale(glm::vec3 const& sVec)
+{
+	trans.vScale.vector = sVec;
+	trans.vScale.isUpdated = true;
 }
 
 
