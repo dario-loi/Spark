@@ -18,15 +18,14 @@ private:
 
 public:
 
-	static unsigned int availableChannel;
 
-	explicit UBO(std::vector<T>&& data_in);
+	explicit UBO(std::vector<T>&& data_in, const unsigned int channel);
 	~UBO();
 	UBO(UBO const&) = delete;
 	UBO& operator=(UBO const&) = delete;
 	UBO(UBO&&) = delete;
 
-	void Bind() const;
+	void Bind();
 	void Unbind() const;
 
 	void setData(std::vector<float>&& newArr);
@@ -57,12 +56,11 @@ public:
 };
 
 template<typename T>
-inline UBO<T>::UBO(std::vector<T>&& data_in)
+inline UBO<T>::UBO(std::vector<T>&& data_in, const unsigned int channel) : channel(channel)
 {
 
 	assert(data_in.size() < SPARK_MAXIMUM_UBO_SIZE);
 	data = std::move(data_in);
-	channel = availableChannel++;
 	isUpdated = false;
 
 	glGenBuffers(1, &RenderID);
@@ -81,14 +79,11 @@ inline UBO<T>::~UBO()
 }
 
 template<typename T>
-inline void UBO<T>::Bind() const
+inline void UBO<T>::Bind()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, RenderID);
 	glBindBufferRange(GL_UNIFORM_BUFFER, channel, RenderID, 0, SPARK_MAXIMUM_UBO_SIZE * sizeof(T));
-	if (isUpdated)
-	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, data.size(), data.data());
-	}
+	Update();
 }
 
 template<typename T>
@@ -128,14 +123,14 @@ inline void UBO<T>::emplaceData(T& element)
 template<typename T>
 inline void UBO<T>::setSubData(T&& element, size_t indx)
 {
-	data.emplace(indx, std::move(element));
+	data.at(indx) = std::move(element);
 	isUpdated = true;
 }
 
 template<typename T>
 inline void UBO<T>::setSubData(T& element, size_t indx)
 {
-	data.emplace(indx, element);
+	data.at(indx) = element;
 	isUpdated = true;
 }
 
@@ -144,10 +139,8 @@ inline void UBO<T>::Update()
 {
 	if (isUpdated)
 	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, data.size(), data.data());
+		glBindBufferRange(GL_UNIFORM_BUFFER, channel, RenderID, 0, SPARK_MAXIMUM_UBO_SIZE * sizeof(T));
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, data.size() * sizeof(T), data.data());
 	}
 	isUpdated = false;
 }
-
-template<typename T>
-unsigned int UBO<T>::availableChannel = 0;

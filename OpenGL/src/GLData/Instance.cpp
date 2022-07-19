@@ -4,6 +4,7 @@
 #include "ext/matrix_transform.hpp"
 #include <iostream>
 #include <gtx/string_cast.hpp>
+#include "gtc/matrix_inverse.hpp"
 
 Instance::Instance(std::shared_ptr<Model> object_model, glm::vec3 position)
 	: objModel(object_model), mMatrix(1.0f), nMatrix(1.0f), displacement(1.0f), rotation(1.0f), scaling(1.0f)
@@ -68,8 +69,8 @@ void Instance::updateModelMatrix()
 
 		}
 
-		mMatrix = displacement * (rotation * (scaling));
-		nMatrix = glm::transpose(glm::inverse(glm::mat3(mMatrix)));
+		mMatrix = displacement * (rotation * scaling);
+		nMatrix = glm::inverseTranspose(glm::mat3(mMatrix));
 		
 #if defined(_DEBUG) && PRINT_MATRICES
 		std::cout << glm::to_string(rotation) << std::endl;

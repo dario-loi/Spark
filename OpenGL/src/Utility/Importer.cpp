@@ -10,7 +10,6 @@
 #include "gtx/hash.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#define TINYOBJLOADER_USE_MAPBOX_EARCUT
 #include "tiny_obj_loader.h"
 
 Model importObj(std::string const& filename)
@@ -30,6 +29,15 @@ Model importObj(std::string const& filename)
         assert(false);
     }
 
+    if (!warning.empty()) {
+        std::cout << warning << std::endl;
+    }
+
+    if (!error.empty()) {
+        std::cerr << error << std::endl;
+    }
+
+
     std::vector<float> raw_verts;
     std::vector<unsigned int> indices;
 
@@ -37,19 +45,20 @@ Model importObj(std::string const& filename)
     {
         for (auto const& indx : shape.mesh.indices)
         {
-            
-            for(unsigned int i = 0; i < 3; ++i)
-            {
-                raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + i]);
-            }
-            for (unsigned int i = 0; i < 3; ++i)
-            {
-                raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index + i]);
-            }
-            for (unsigned int i = 0; i < 2; ++i)
-            {
-                raw_verts.emplace_back(attributes.texcoords[2ui64 * indx.texcoord_index + i]);
-            }
+            //pos
+            raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + 0]);
+            raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + 1]);
+            raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + 2]);
+
+            //norm
+            raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index]);
+            raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index + 1]);
+            raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index + 2]);
+
+            //uv
+            raw_verts.emplace_back(attributes.texcoords[2ui64 * indx.texcoord_index]);
+            raw_verts.emplace_back(attributes.texcoords[2ui64 * indx.texcoord_index + 1]);
+
 
             glm::vec3 position = {
                 attributes.vertices[3ui64 * indx.vertex_index],
@@ -70,6 +79,11 @@ Model importObj(std::string const& filename)
                 if (v1 == v2)
                 {
                     indices.emplace_back(uniqueVertices[position]);
+                    for (int i = 0; i < 8; ++i)
+                    {
+                        raw_verts.pop_back();
+                    }
+                    
                 }
                 else
                 {

@@ -39,6 +39,7 @@ public:
 	*/
 
 	void SetUniform1i(const std::string& name, int v0);
+	void SetUniform1ui(const std::string& name, const unsigned int ui0);
 	void SetUniform1f(const std::string& name, float v0);
 	void SetUniform4f(const std::string& name, float v0, float v1, float f2, float f3);
 	void SetUniform3f(const std::string& name, float v0, float v1, float v2);

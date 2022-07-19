@@ -140,8 +140,6 @@ int main(void)
     //Gamma Correction
     glEnable(GL_FRAMEBUFFER_SRGB);
 
-
-
     //Enable Mouse in
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
@@ -160,12 +158,14 @@ int main(void)
 
     
     {
-        Model robot = importObj("res/model/robot/source/robot.obj");
+        
+        Model tank = importObj("res/model/tank/source/tank.obj");
             
-        robot.getVAO().add_attr<float>(3); //Position
-        robot.getVAO().add_attr<float>(3); //Normal
-        robot.getVAO().add_attr<float>(2); //Texture
-        robot.ModelInit();
+        tank.getVAO().add_attr<float>(3); //Position
+        tank.getVAO().add_attr<float>(3); //Normal
+        tank.getVAO().add_attr<float>(2); //Texture
+        tank.ModelInit();
+        
 
         Model cube = importObj("res/model/cube/cube.obj");
         cube.getVAO().add_attr<float>(3); //Position
@@ -184,47 +184,42 @@ int main(void)
 
         instances.reserve(INSTANCES);
 
-        auto posDistribution = RandomGenerator::getRealDistribution(-10, 10);
-        auto rotDistribution = RandomGenerator::getRealDistribution(-180, 180);
-        auto gen = RandomGenerator::getGenerator();
-
         {
-            auto model_ptr = std::make_shared<Model>(robot);
+            auto model_ptr = std::make_shared<Model>(tank);
 
             for (int c = 0; c < INSTANCES; ++c)
             {
                 auto position = glm::vec3(
-                    posDistribution(gen),
-                    posDistribution(gen),
-                    posDistribution(gen)
+                    0.0f, 0.0f, 0.0f
                 );
 
                 instances.emplace_back(model_ptr, position);
                 instances.at(c).Rotate(glm::vec3(180.0f, 0.0f, 0.0f));
-                instances.at(c).Scale(glm::vec3(0.5f));
+                instances.at(c).Scale(glm::vec3(0.02f));
             }
         }
 
         std::vector<Instance> lights;
 
-        const constexpr unsigned int NUM_LIGHTS = 2;
+        const constexpr unsigned int NUM_LIGHTS = 1;
 
         for (size_t i = 0; i < NUM_LIGHTS; ++i)
         {
-            lights.push_back({ std::make_shared<Model>(cube), { 1.0f + i, 1.0f, 2.0f } });
+            lights.push_back({ std::make_shared<Model>(cube), { 5.0f, -1.0f, 2.0f } });
         }
 
         /*
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices)
         */
 
-        auto robot_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        auto tank_tex = Texture("res/model/tank/textures/tank_texture.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        //auto cube_tex = Texture("res/textures/Grass.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
 
         /*
             Init Shader
         */
 
-        auto shader = Shader("res/shaders/Guitar.shader");
+        auto shader = Shader("res/shaders/Phong.shader");
         auto light_shader = Shader("res/shaders/Light.shader");
         
         shader.Bind();
@@ -240,7 +235,8 @@ int main(void)
             return glm::vec4(inst.getTransform().vDisplacement.vector, 1.0f);
             });
 
-        UBO light_positions{std::move(positions)};
+        UBO light_positions{std::move(positions), 1};
+        light_positions.Bind();
 
 #ifdef _DEBUG
 
@@ -257,6 +253,7 @@ int main(void)
         float thisFrame;
 
         shader.setUniform4mat("projection", cam.getProj());
+        shader.SetUniform1ui("nLights", NUM_LIGHTS);
 
         shader.Unbind();
 
@@ -279,13 +276,22 @@ int main(void)
 
             /* Render here */
 
+            
             auto& light = lights[0];
 
             light_shader.Bind();
+
+            //light.Move({ 0.1f, 0.0f, 0.0f });
             light_shader.setUniform4mat("view", cam.getView(deltaTime));
             light_shader.setUniform4mat("u_mMatrix", light.getModelMatrix());
 
             light.getModel()->Bind();
+
+            //light.setPos(glm::vec3(3.0f, 10.0f * glm::sin(thisFrame/10.0f), -2.0f));
+            light_positions.Bind();
+            light_positions.setSubData(glm::vec4(light.getTransform().vDisplacement.vector, 1.0f), 0);
+            light_positions.Update();
+
             light.Draw();
 
             light.getModel()->Unbind();
@@ -297,7 +303,7 @@ int main(void)
             shader.SetUniform3f("u_CameraPos", cam.getPos());
 
             instances[0].getModel()->Bind();
-            robot_tex.Bind(0);
+            tank_tex.Bind(0);
             for (auto& inst : instances)
             {
                 //inst.Move({0.01f, 0.0f, 0.0f});

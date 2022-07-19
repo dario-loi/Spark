@@ -68,9 +68,9 @@ void Camera::Move(float x, float y, float z)
 	nextMove += glm::vec3(x,y,z);
 }
 
-void Camera::Rotate(glm::vec2 rotation)
+void Camera::Rotate(glm::vec2 rot)
 {
-	rotation += rotation;
+	rotation += rot;
 
 	if (rotation.y > 89.0f)
 		rotation.y = 89.0f;

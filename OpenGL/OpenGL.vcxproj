@@ -238,7 +238,7 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
   <ItemGroup>
     <None Include="Doxyfile" />
     <None Include="res\shaders\Basic.shader" />
-    <None Include="res\shaders\Guitar.shader" />
+    <None Include="res\shaders\Phong.shader" />
     <None Include="res\shaders\Light.shader" />
     <None Include="res\shaders\Normals.shader" />
   </ItemGroup>

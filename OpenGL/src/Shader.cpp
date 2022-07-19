@@ -1,5 +1,5 @@
 #include "Shader.h"
-
+#include "gtc/type_ptr.hpp"
 
 Shader::Shader(const std::string& filepath)
 	: m_FilePath(filepath), m_RendererID(0)
@@ -129,27 +129,32 @@ void Shader::SetUniform3f(const std::string& name, glm::vec3 v)
 
 void Shader::setUniform4mat(const std::string& name, const glm::mat4& matrix)
 {
-    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::setUniform3mat(const std::string& name, const glm::mat3& matrix)
 {
-    glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::SetUniform1i(const std::string& name, int v0)
+void Shader::SetUniform1i(const std::string& name, const int v0)
 {
     glUniform1i(GetUniformLocation(name), v0);
 }
 
-void Shader::SetUniform1f(const std::string& name, float v0)
+void Shader::SetUniform1ui(const std::string& name, const unsigned int ui0)
+{
+    glUniform1ui(GetUniformLocation(name), ui0);
+}
+
+void Shader::SetUniform1f(const std::string& name, const float v0)
 {
     glUniform1f(GetUniformLocation(name), v0);
 }
 
 int Shader::GetUniformLocation(const std::string& name)
 {
-    if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
+    if (m_UniformLocationCache.contains(name))
     {
         return m_UniformLocationCache[name];
     }
