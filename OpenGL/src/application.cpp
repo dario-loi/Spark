@@ -16,6 +16,7 @@
 #include <vec3.hpp>
 #include <math.h>
 #include <random>
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include <array>
@@ -24,6 +25,7 @@
 
 #include "GLData/Model.h"
 #include "GLData/Buffers/VAO.h"
+#include "GLData/Buffers/UBO.h"
 #include "GLData/Instance.h"
 #include "GLData/Texture.h"
 #include "Utility/Importer.h"
@@ -32,6 +34,7 @@
 
 #include "Shader.h"
 #include "Camera.h"
+
 
 #define LOG(x) std::cerr<<x<<std::endl;
 /**
@@ -53,14 +56,13 @@ MessageCallback(GLenum source,
         type, severity, message);
 }
 
-constexpr int width = 1280;
-constexpr int height = 720;
+constexpr const int width = 1280;
+constexpr const int height = 720;
 
 float lastX = width / 2;
 float lastY = height / 2;
 
 Camera cam(1000.0f, 4 / 3, 2.5f);
-
 
 
 void processInput(GLFWwindow* window, Camera* camera)
@@ -158,12 +160,18 @@ int main(void)
 
     
     {
-        Model guitar = importObj("res/model/robot/source/robot.obj");
+        Model robot = importObj("res/model/robot/source/robot.obj");
             
-        guitar.getVAO().add_attr<float>(3); //Position
-        guitar.getVAO().add_attr<float>(3); //Normal
-        guitar.getVAO().add_attr<float>(2); //Texture
-        guitar.ModelInit();
+        robot.getVAO().add_attr<float>(3); //Position
+        robot.getVAO().add_attr<float>(3); //Normal
+        robot.getVAO().add_attr<float>(2); //Texture
+        robot.ModelInit();
+
+        Model cube = importObj("res/model/cube/cube.obj");
+        cube.getVAO().add_attr<float>(3); //Position
+        cube.getVAO().add_attr<float>(3); //Normal
+        cube.getVAO().add_attr<float>(2); //Texture
+        cube.ModelInit();
         
         /*
             Create Instances
@@ -181,7 +189,7 @@ int main(void)
         auto gen = RandomGenerator::getGenerator();
 
         {
-            auto model_ptr = std::make_shared<Model>(guitar);
+            auto model_ptr = std::make_shared<Model>(robot);
 
             for (int c = 0; c < INSTANCES; ++c)
             {
@@ -197,19 +205,51 @@ int main(void)
             }
         }
 
+        std::vector<Instance> lights;
+
+        for (size_t i = 0; i < 127; ++i)
+        {
+            lights.push_back({ std::make_shared<Model>(cube), { 1.0f + i, 1.0f, 2.0f } });
+        }
+
         /*
-            Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices
+            Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices)
         */
 
-        auto guitar_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        auto robot_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
 
         /*
             Init Shader
         */
 
         auto shader = Shader("res/shaders/Guitar.shader");
+        auto light_shader = Shader("res/shaders/Light.shader");
         
         shader.Bind();
+
+        /*
+            Initialize UBOs
+        */
+
+        
+        std::vector<glm::vec4> positions(lights.size());
+
+        std::transform(lights.begin(), lights.end(), positions.begin(), [](Instance const& inst) -> glm::vec4 {
+            return glm::vec4(inst.getTransform().vDisplacement.vector, 1.0f);
+            });
+
+        UBO light_positions{std::move(positions)};
+
+#ifdef _DEBUG
+
+        light_positions.printContents();
+
+#endif // _DEBUG
+
+        
+
+        std::cout << light_positions.getSize() << std::endl;
+        
 
         /* Loop until the user closes the window */
         
@@ -218,28 +258,51 @@ int main(void)
 
         shader.setUniform4mat("projection", cam.getProj());
 
+        shader.Unbind();
+
+        light_shader.Bind();
+        light_shader.setUniform4mat("projection", cam.getProj());
+        light_shader.Unbind();
+
         while (!glfwWindowShouldClose(window))
         {
             
-            thisFrame = glfwGetTime();
+            thisFrame = static_cast<float>(glfwGetTime());
             float deltaTime = thisFrame - lastFrame;
             lastFrame = thisFrame;
 
             processInput(window, &cam);
 
-            shader.setUniform4mat("view", cam.getView(deltaTime));
-            shader.SetUniform3f("u_CameraPos", cam.getPos());
-            
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            unsigned int inst_indx = 0;
+            size_t inst_indx = 0;
 
             /* Render here */
+
+            auto& light = lights[0];
+
+            light_shader.Bind();
+            light_shader.setUniform4mat("view", cam.getView(deltaTime));
+            light_shader.setUniform4mat("u_mMatrix", light.getModelMatrix());
+
+            light.getModel()->Bind();
+            light.Draw();
+
+            light.getModel()->Unbind();
+            light_shader.Unbind();
+
+            shader.Bind();
+
+            shader.setUniform4mat("view", cam.getView(deltaTime));
+            shader.SetUniform3f("u_CameraPos", cam.getPos());
+
             instances[0].getModel()->Bind();
-            guitar_tex.Bind(0);
+            robot_tex.Bind(0);
             for (auto& inst : instances)
             {
-                inst.Rotate(glm::vec3(0.0f, 0.1f, 0.0f));
+                //inst.Move({0.01f, 0.0f, 0.0f});
+                inst.Rotate(glm::vec3(0.01f, 0.1f, 0.0f));
+                //inst.Scale({ 0.999f, 0.999f, 0.999f });
 
                 shader.SetUniform1i("u_Texture", 0);
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
@@ -247,9 +310,10 @@ int main(void)
 
                 inst.Draw();
 
-                inst_indx += 1;
+                ++inst_indx;
             }
             instances[0].getModel()->Unbind();
+            shader.Unbind();
 
             if (!glfwWindowShouldClose(window))
             {
@@ -259,6 +323,8 @@ int main(void)
                 /* Poll for and process events */
                 glfwPollEvents();
             }
+
+            
         }
 
     }

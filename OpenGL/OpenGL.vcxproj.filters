@@ -92,12 +92,16 @@
     <ClInclude Include="res\vendor\tiny_obj_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\GLData\Buffers\UBO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile" />
     <None Include="res\shaders\Basic.shader" />
     <None Include="res\shaders\Guitar.shader" />
     <None Include="res\shaders\Normals.shader" />
+    <None Include="res\shaders\Light.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Grass.png">

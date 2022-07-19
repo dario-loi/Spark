@@ -60,7 +60,7 @@ void main()
 	vec3 tex_col = texture(u_Texture, v_TexCoord).rgb;
 
 	//Diffuse
-	vec3 diffuse = max(dot(norm, light_dir), 0.0f) * sun_color;
+	vec3 diffuse = clamp(dot(norm, light_dir), 0.0f, 1.0f) * sun_color;
 
 	//Ambient Light
 	vec3 ambient = ambient_light * ambient_color;

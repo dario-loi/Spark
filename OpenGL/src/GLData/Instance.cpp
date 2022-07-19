@@ -5,7 +5,7 @@
 #include <gtx/string_cast.hpp>
 
 Instance::Instance(std::shared_ptr<Model> object_model, glm::vec3 position)
-	: objModel(object_model), mMatrix(1.0f)
+	: objModel(object_model), mMatrix(1.0f), nMatrix(1.0f), displacement(1.0f), rotation(1.0f), scaling(1.0f)
 {
 	trans.vDisplacement.vector = position;
 	trans.vRotation.vector = glm::vec3(0.0f);
@@ -24,6 +24,13 @@ glm::mat4 Instance::getModelMatrix()
 	return mMatrix;
 }
 
+
+glm::mat4 Instance::getTransMatrix()
+{
+	updateModelMatrix();
+	return displacement;
+}
+
 glm::mat3 Instance::getNormalMatrix()
 {
 	updateModelMatrix();
@@ -36,7 +43,7 @@ void Instance::updateModelMatrix()
 	{
 		if(trans.vDisplacement.isUpdated)
 		{
-			mMatrix = glm::translate(mMatrix, trans.vDisplacement.vector);
+			displacement = glm::translate(displacement, trans.vDisplacement.vector);
 
 			trans.vDisplacement.isUpdated = false;
 			trans.vDisplacement.vector = glm::vec3(0.0f);
@@ -45,9 +52,9 @@ void Instance::updateModelMatrix()
 
 		if (trans.vRotation.isUpdated)
 		{
-			mMatrix = glm::rotate(mMatrix, glm::radians(trans.vRotation.vector.x), glm::vec3(1.0f, 0.0f, 0.0f));
-			mMatrix = glm::rotate(mMatrix, glm::radians(trans.vRotation.vector.y), glm::vec3(0.0f, 1.0f, 0.0f));
-			mMatrix = glm::rotate(mMatrix, glm::radians(trans.vRotation.vector.z), glm::vec3(0.0f, 0.0f, 1.0f));
+			rotation = glm::rotate(rotation, glm::radians(trans.vRotation.vector.x), glm::vec3(1.0f, 0.0f, 0.0f));
+			rotation = glm::rotate(rotation, glm::radians(trans.vRotation.vector.y), glm::vec3(0.0f, 1.0f, 0.0f));
+			rotation = glm::rotate(rotation, glm::radians(trans.vRotation.vector.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 			trans.vRotation.isUpdated = false;
 			trans.vRotation.vector = glm::vec3(0.0f);
@@ -56,18 +63,24 @@ void Instance::updateModelMatrix()
 
 		if (trans.vScale.isUpdated)
 		{
-			mMatrix = glm::scale(mMatrix, trans.vScale.vector);
+			scaling = glm::scale(scaling, trans.vScale.vector);
 
 			trans.vScale.isUpdated = false;
 			trans.vScale.vector = glm::vec3(1.0f);
 
 		}
 
+		mMatrix = displacement * (rotation * (scaling * glm::identity<glm::mat4>()));
 		nMatrix = glm::transpose(glm::inverse(glm::mat3(mMatrix)));
+		
+#ifdef _DEBUG
+		std::cout << glm::to_string(rotation) << std::endl;
+		std::cout << glm::to_string(mMatrix) << std::endl;
+		std::cout << glm::to_string(nMatrix) << std::endl;
+		std::cout << std::endl;
+#endif // _DEBUG
 	}
 }
-
-
 
 void Instance::Move(const glm::vec3& dVec)
 {
@@ -89,6 +102,7 @@ void Instance::Scale(const glm::vec3& sVec)
 
 void Instance::Draw() const
 {
+
 	glDrawElements(GL_TRIANGLES, (GLsizei)objModel->getIndexSize(), 
 					GL_UNSIGNED_INT, const_cast<GLuint*>(objModel->getIndexReference().data()));
 }

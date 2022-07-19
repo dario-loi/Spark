@@ -11,10 +11,15 @@ private:
 	glm::mat4 mMatrix;
 	glm::mat3 nMatrix;
 
+	glm::mat4 displacement;
+	glm::mat4 rotation;
+	glm::mat4 scaling;
+
 	struct TransformElement
 	{
 		glm::vec3 vector;
 		bool isUpdated;
+
 	};
 
 	struct Transform{
@@ -32,6 +37,7 @@ public:
 	std::shared_ptr<Model> getModel() const { return objModel; };
 	glm::mat4 getModelMatrix();
 	glm::mat3 getNormalMatrix();
+	glm::mat4 getTransMatrix();
 	void updateModelMatrix();
 
 	Transform getTransform() const { return trans; }

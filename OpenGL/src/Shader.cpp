@@ -66,7 +66,7 @@ GLuint Shader::CompileShader(GLuint type,
         glGetShaderInfoLog(id, length, &length, message);
         std::cout << "failed to compile " <<
             (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
-            << " shader!" << std::endl;
+            << " shader!" << std::endl << m_FilePath << std::endl;
 
         std::cout << message << std::endl;
         glDeleteShader(id);
