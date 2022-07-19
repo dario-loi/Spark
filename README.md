@@ -1,4 +1,4 @@
-# D-Engine
+# Spark
  Repository originally created to store the various versions of a follow-along youtube tutorial on https://thecherno.com/opengl mixed with information on https://learnopengl.com/
 
 The aim is to acquire the technical skills necessary to work in an OpenGL environment comfortably whilst contemporaneously building up a *sufficiently* efficient implementation of an engine that can run common lightning models in real-time

@@ -133,7 +133,7 @@ int main(void)
     glEnable(GL_MULTISAMPLE);
 
     //Enable Face Culling for additional performance 
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
 
@@ -190,22 +190,22 @@ int main(void)
             for (int c = 0; c < INSTANCES; ++c)
             {
                 auto position = glm::vec3(
-                    0.0f, 0.0f, 0.0f
+                    0.0f, -0.01f, 0.0f
                 );
 
                 instances.emplace_back(model_ptr, position);
                 instances.at(c).Rotate(glm::vec3(180.0f, 0.0f, 0.0f));
-                instances.at(c).Scale(glm::vec3(0.02f));
+                instances.at(c).Scale(glm::vec3(0.05f));
             }
         }
 
         std::vector<Instance> lights;
 
-        const constexpr unsigned int NUM_LIGHTS = 1;
+        const constexpr unsigned int NUM_LIGHTS = 2;
 
         for (size_t i = 0; i < NUM_LIGHTS; ++i)
         {
-            lights.push_back({ std::make_shared<Model>(cube), { 5.0f, -1.0f, 2.0f } });
+            lights.push_back({ std::make_shared<Model>(cube), { 5.0f , -10.0f, 0.0f - (static_cast<float>(i)) * 4.0f } });
         }
 
         /*
@@ -280,21 +280,27 @@ int main(void)
             auto& light = lights[0];
 
             light_shader.Bind();
-
-            //light.Move({ 0.1f, 0.0f, 0.0f });
             light_shader.setUniform4mat("view", cam.getView(deltaTime));
-            light_shader.setUniform4mat("u_mMatrix", light.getModelMatrix());
+            
 
-            light.getModel()->Bind();
+            for (size_t indx = 0; auto& light : lights)
+            {
 
-            //light.setPos(glm::vec3(3.0f, 10.0f * glm::sin(thisFrame/10.0f), -2.0f));
-            light_positions.Bind();
-            light_positions.setSubData(glm::vec4(light.getTransform().vDisplacement.vector, 1.0f), 0);
+                light.getModel()->Bind();
+                //auto velocity = glm::sin(thisFrame / 10.0f) / 50.0f;
+                //light.Move({ (indx) * velocity, (1 - indx) * velocity, 0.0f });
+
+                light_shader.setUniform4mat("u_mMatrix", light.getModelMatrix());
+
+                light_positions.Bind();
+                light_positions.setSubData(glm::vec4(light.getTransform().vDisplacement.vector, 1.0f), indx++);
+                
+
+                light.Draw();
+                light.getModel()->Unbind();
+            }
+
             light_positions.Update();
-
-            light.Draw();
-
-            light.getModel()->Unbind();
             light_shader.Unbind();
 
             shader.Bind();
@@ -307,7 +313,8 @@ int main(void)
             for (auto& inst : instances)
             {
                 //inst.Move({0.01f, 0.0f, 0.0f});
-                inst.Rotate(glm::vec3(0.01f, 0.1f, 0.0f));
+                
+                inst.Rotate(glm::vec3(0.0f, 0.25f, 0.0f));
                 //inst.Scale({ 0.999f, 0.999f, 0.999f });
 
                 shader.SetUniform1i("u_Texture", 0);
