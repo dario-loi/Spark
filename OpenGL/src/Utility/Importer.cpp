@@ -5,22 +5,67 @@
 #include <assert.h>
 #include <vector>
 #include <algorithm>
-#include <unordered_map>
+#include <map>
 #include "vec3.hpp"
 #include "gtx/hash.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
+
 Model importObj(std::string const& filename)
 {
+    struct Vertex
+    {
+        float x;
+        float y;
+        float z;
+
+        float j;
+        float k;
+        float l;
+
+        float u;
+        float v;
+    };
+
+    struct indx_orderable
+    {
+        tinyobj::index_t indx;
+
+        bool operator<(const indx_orderable& rhs) const
+        {
+            if (indx.vertex_index < rhs.indx.vertex_index)
+            {
+                return true;
+            }
+            else if (indx.vertex_index == rhs.indx.vertex_index)
+            {
+                if (indx.normal_index < rhs.indx.normal_index)
+                {
+                    return true;
+                }
+                else if (indx.normal_index == rhs.indx.normal_index)
+                {
+                    return indx.texcoord_index < rhs.indx.texcoord_index;
+                }
+            }
+
+            return false;
+        }
+
+        explicit(false) indx_orderable(tinyobj::index_t i) : indx(i) {}
+    };
+
+    //If this is not true, Nasal Demons.
+    static_assert(sizeof(Vertex) == (sizeof(float) * 8));
 
     tinyobj::attrib_t attributes;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string warning;
     std::string error;
-    std::unordered_map<glm::vec3, unsigned int> uniqueVertices;
+    std::map<indx_orderable, size_t> vertCache;
 
     if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &error, filename.c_str(), (filename + "/../").c_str(), true))
     {
@@ -37,62 +82,48 @@ Model importObj(std::string const& filename)
         std::cerr << error << std::endl;
     }
 
-
-    std::vector<float> raw_verts;
+    std::vector<Vertex> verts;   // The number of vertices has a correspondence with the number of specified materials.
     std::vector<unsigned int> indices;
+
+    // We work under the assumption of triangulation
+    size_t curr_top = 0; // we store the top-most vertex in a separate variable for convenience.
 
     for (auto const& shape : shapes)
     {
-        for (auto const& indx : shape.mesh.indices)
+        for (size_t triangle = 0ui32; triangle < shape.mesh.indices.size() / 3; ++triangle)
         {
-            //pos
-            raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + 0]);
-            raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + 1]);
-            raw_verts.emplace_back(attributes.vertices[3ui64 * indx.vertex_index + 2]);
-
-            //norm
-            raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index]);
-            raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index + 1]);
-            raw_verts.emplace_back(attributes.normals[3ui64 * indx.normal_index + 2]);
-
-            //uv
-            raw_verts.emplace_back(attributes.texcoords[2ui64 * indx.texcoord_index]);
-            raw_verts.emplace_back(attributes.texcoords[2ui64 * indx.texcoord_index + 1]);
-
-
-            glm::vec3 position = {
-                attributes.vertices[3ui64 * indx.vertex_index],
-                attributes.vertices[3ui64 * indx.vertex_index + 1ui64],
-                attributes.vertices[3ui64 * indx.vertex_index + 2ui64]
-            };
-
-            if (!uniqueVertices.contains(position)) {
-                uniqueVertices[position] = static_cast<uint32_t>((raw_verts.size()/8) - 1);
-                indices.emplace_back(uniqueVertices[position]);
-            }
-            else
+            for (size_t vert = 0; vert < 3; ++vert)
             {
+                auto const& vert_indxs = shape.mesh.indices[3 * triangle + vert];
 
-                std::vector<float> v1(std::next(raw_verts.end(), -8), raw_verts.end());
-                std::vector<float> v2(std::next(raw_verts.begin(), uniqueVertices[position] * 8), std::next(raw_verts.begin(), 8 + uniqueVertices[position] * 8));
-
-                if (v1 == v2)
+                if (vertCache.contains(vert_indxs))
                 {
-                    indices.emplace_back(uniqueVertices[position]);
-                    for (int i = 0; i < 8; ++i)
-                    {
-                        raw_verts.pop_back();
-                    }
-                    
-                }
-                else
-                {
-                    indices.emplace_back(static_cast<unsigned int>((raw_verts.size() / 8) - 1));
+                    indices.emplace_back(vertCache[vert_indxs]);
+                    continue;
                 }
 
+                //Boilerplate-y
+                verts.emplace_back(
+                    attributes.vertices[vert_indxs.vertex_index * 3],
+                    attributes.vertices[vert_indxs.vertex_index * 3 + 1],
+                    attributes.vertices[vert_indxs.vertex_index * 3 + 2],
+
+                    attributes.normals[vert_indxs.normal_index * 3],
+                    attributes.normals[vert_indxs.normal_index * 3 + 1],
+                    attributes.normals[vert_indxs.normal_index * 3 + 2],
+
+                    attributes.texcoords[vert_indxs.texcoord_index * 2],
+                    attributes.texcoords[vert_indxs.texcoord_index * 2 + 1]
+                );
+
+                indices.emplace_back(curr_top);
+                vertCache[vert_indxs] = curr_top++;
             }
         }
     }
+
+    std::vector<float> raw_verts(verts.size()*8);
+    memcpy(raw_verts.data(), verts.data(), verts.size() * sizeof(Vertex)); //pray for the best.
 
     return Model(std::move(raw_verts), std::move(indices));
 }   

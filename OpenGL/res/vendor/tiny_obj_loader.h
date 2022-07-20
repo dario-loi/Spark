@@ -206,6 +206,7 @@ typedef struct {
   int vertex_index;
   int normal_index;
   int texcoord_index;
+
 } index_t;
 
 typedef struct {
