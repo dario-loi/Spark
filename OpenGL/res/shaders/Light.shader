@@ -1,12 +1,19 @@
 #shader vertex
-#version 330 core
+#version 420 core
 layout(location = 0) in vec4 position;
 
 out vec3 v_TexCoord;
 
 uniform mat4 u_mMatrix;
-uniform mat4 view;
-uniform mat4 projection;
+
+layout(binding = 2, std140) uniform cameraUBO
+{
+
+	mat4 view;			//View Matrix
+	mat4 projection;	//Proj Matrix
+	vec3 camera_pos;	//Camera Position Vector
+
+};
 
 void main()
 {
@@ -15,7 +22,7 @@ void main()
 }
 
 #shader fragment
-#version 330 core
+#version 420 core
 layout(location = 0) out vec4 color;
 
 void main()

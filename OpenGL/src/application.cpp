@@ -133,7 +133,7 @@ int main(void)
     glEnable(GL_MULTISAMPLE);
 
     //Enable Face Culling for additional performance 
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     //Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
 
@@ -158,14 +158,14 @@ int main(void)
 
     
     {
-        
+        /*
         Model tank = importObj("res/model/tank/source/tank.obj");
             
         tank.getVAO().add_attr<float>(3); //Position
         tank.getVAO().add_attr<float>(3); //Normal
         tank.getVAO().add_attr<float>(2); //Texture
         tank.ModelInit();
-        
+        */
 
         Model cube = importObj("res/model/cube/cube.obj");
         cube.getVAO().add_attr<float>(3); //Position
@@ -180,22 +180,26 @@ int main(void)
         //Randomly gen INSTANCES instances
         std::vector<Instance> instances;
 
-        constexpr const unsigned int INSTANCES = 1;
+        constexpr const unsigned int INSTANCES = 1000;
 
         instances.reserve(INSTANCES);
 
         {
-            auto model_ptr = std::make_shared<Model>(tank);
+            auto model_ptr = std::make_shared<Model>(cube);
+            auto gen = RandomGenerator::getGenerator();
+            auto dist = RandomGenerator::getRealDistribution(-20.f, 20.f);
+            auto dist_scale = RandomGenerator::getRealDistribution(0.5f, 1.5f);
+            auto dist_rot = RandomGenerator::getRealDistribution(0.f, 359.9f);
 
             for (int c = 0; c < INSTANCES; ++c)
             {
                 auto position = glm::vec3(
-                    0.0f, -0.01f, 0.0f
+                    dist(gen), dist(gen), dist(gen)
                 );
 
                 instances.emplace_back(model_ptr, position);
-                instances.at(c).Rotate(glm::vec3(180.0f, 0.0f, 0.0f));
-                instances.at(c).Scale(glm::vec3(0.05f));
+                instances.at(c).Rotate(glm::vec3(dist_rot(gen), dist_rot(gen), dist_rot(gen)));
+                instances.at(c).Scale(glm::vec3(dist_scale(gen)));
             }
         }
 
@@ -212,9 +216,9 @@ int main(void)
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices)
         */
 
-        auto tank_tex = Texture("res/model/tank/textures/tank_texture.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
-        //auto cube_tex = Texture("res/textures/Grass.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
-
+        //auto tank_tex = Texture("res/model/tank/textures/tank_texture.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        auto cube_tex = Texture("res/textures/Grass.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        auto cube_spec = Texture("res/textures/Grass_spec.png", GL_TEXTURE_2D, GL_RGBA8);
         /*
             Init Shader
         */
@@ -227,7 +231,6 @@ int main(void)
         /*
             Initialize UBOs
         */
-
         
         std::vector<glm::vec4> positions(lights.size());
 
@@ -238,28 +241,23 @@ int main(void)
         UBO light_positions{std::move(positions), 1};
         light_positions.Bind();
 
-#ifdef _DEBUG
+        using cam_struct = struct {
+            glm::mat4 view;
+            glm::mat4 proj;
+            glm::vec3 pos;
+        };
 
-        light_positions.printContents();
-
-#endif // _DEBUG
-
-
-        std::cout << light_positions.getSize() << std::endl;
+        std::vector<cam_struct> cam_mat{ {cam.getView(1.0f), cam.getProj(), cam.getPos()} };
+        UBO camera_data{ std::move(cam_mat), 2 };
+        camera_data.Bind();
         
         /* Loop until the user closes the window */
         
         float lastFrame = 0.0f;
         float thisFrame;
 
-        shader.setUniform4mat("projection", cam.getProj());
         shader.SetUniform1ui("nLights", NUM_LIGHTS);
-
         shader.Unbind();
-
-        light_shader.Bind();
-        light_shader.setUniform4mat("projection", cam.getProj());
-        light_shader.Unbind();
 
         while (!glfwWindowShouldClose(window))
         {
@@ -276,26 +274,22 @@ int main(void)
 
             /* Render here */
 
-            
-            auto& light = lights[0];
-
             light_shader.Bind();
-            light_shader.setUniform4mat("view", cam.getView(deltaTime));
-            
+
+            camera_data.getElementAt(0).view = cam.getView(deltaTime);
+            camera_data.getElementAt(0).pos = cam.getPos();
+            camera_data.Update();
 
             for (size_t indx = 0; auto& light : lights)
             {
 
                 light.getModel()->Bind();
-                //auto velocity = glm::sin(thisFrame / 10.0f) / 50.0f;
-                //light.Move({ (indx) * velocity, (1 - indx) * velocity, 0.0f });
 
                 light_shader.setUniform4mat("u_mMatrix", light.getModelMatrix());
 
                 light_positions.Bind();
                 light_positions.setSubData(glm::vec4(light.getTransform().vDisplacement.vector, 1.0f), indx++);
                 
-
                 light.Draw();
                 light.getModel()->Unbind();
             }
@@ -305,19 +299,14 @@ int main(void)
 
             shader.Bind();
 
-            shader.setUniform4mat("view", cam.getView(deltaTime));
-            shader.SetUniform3f("u_CameraPos", cam.getPos());
-
             instances[0].getModel()->Bind();
-            tank_tex.Bind(0);
+            cube_tex.Bind(0);
+            cube_spec.Bind(1);
             for (auto& inst : instances)
             {
-                //inst.Move({0.01f, 0.0f, 0.0f});
-                
-                inst.Rotate(glm::vec3(0.0f, 0.25f, 0.0f));
-                //inst.Scale({ 0.999f, 0.999f, 0.999f });
 
                 shader.SetUniform1i("u_Texture", 0);
+                shader.SetUniform1i("u_Specular", 1);
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
                 shader.setUniform3mat("u_normalMatrix", inst.getNormalMatrix());
 

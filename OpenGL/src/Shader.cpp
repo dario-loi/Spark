@@ -1,17 +1,19 @@
 #include "Shader.h"
 #include "gtc/type_ptr.hpp"
+#include <array>
 
 Shader::Shader(const std::string& filepath)
-	: m_FilePath(filepath), m_RendererID(0)
+	: m_RendererID(0), m_FilePath(filepath)
 {
     ShaderProgramSource source = ParseShader();
-    m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
+    m_RendererID = CreateShader(source.VertexSource, 
+        source.FragmentSource, source.TCSource,
+        source.TESource,
+        source.GeometrySource);
 }
-
 
 Shader::~Shader()
 {
-    std::clog << "Destructed Shader!" << std::endl;
     glDeleteProgram(m_RendererID);
 }
 
@@ -19,12 +21,12 @@ ShaderProgramSource Shader::ParseShader()
 {
     enum class ShaderType
     {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
+        NONE = -1, VERTEX = 0, FRAGMENT = 1, TCS = 2, TES = 3, GEOMETRY = 4
     };
 
     std::ifstream stream(m_FilePath);
     std::string line;
-    std::stringstream ss[2];
+    std::array<std::stringstream, 5> ss;
     ShaderType type = ShaderType::NONE;
 
     while (getline(stream, line))
@@ -35,6 +37,12 @@ ShaderProgramSource Shader::ParseShader()
                 type = ShaderType::VERTEX;
             else if (line.find("fragment") != std::string::npos)
                 type = ShaderType::FRAGMENT;
+            else if (line.find("TCS") != std::string::npos)
+                type = ShaderType::TCS;
+            else if (line.find("TES") != std::string::npos)
+                type = ShaderType::TES;
+            else if (line.find("geometry") != std::string::npos)
+                type = ShaderType::GEOMETRY;
         }
         else if (type != ShaderType::NONE)
         {
@@ -63,6 +71,8 @@ GLuint Shader::CompileShader(GLuint type,
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 
         char* message = (char*)_malloca(length * sizeof(char));
+
+
         glGetShaderInfoLog(id, length, &length, message);
         std::cout << "failed to compile " <<
             (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
@@ -79,11 +89,37 @@ GLuint Shader::CompileShader(GLuint type,
 
 
 GLuint Shader::CreateShader(const std::string& vertexShader,
-    const std::string& fragmentShader)
+    const std::string& fragmentShader, 
+    std::string const& TCShader,
+    std::string const& TEShader, 
+    std::string const& geometryShader)
 {
     GLuint program = glCreateProgram();
     GLuint vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
     GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    GLuint tc = 0;
+    GLuint te = 0;
+    GLuint gs = 0;
+
+    if (!TCShader.empty())
+    {
+        tc = CompileShader(GL_TESS_CONTROL_SHADER, TCShader);
+        glAttachShader(program, tc);
+    }
+
+    if (!TEShader.empty())
+    {
+        te = CompileShader(GL_TESS_EVALUATION_SHADER, TEShader);
+        glAttachShader(program, te);
+    }
+
+    if (!geometryShader.empty())
+    {
+        gs = CompileShader(GL_GEOMETRY_SHADER, geometryShader);
+        glAttachShader(program, gs);
+    }
+
 
     glAttachShader(program, vs);
     glAttachShader(program, fs);
@@ -97,6 +133,24 @@ GLuint Shader::CreateShader(const std::string& vertexShader,
 
     glDetachShader(program, vs);
     glDetachShader(program, fs);
+
+    if (!TCShader.empty())
+    {
+        glDeleteShader(tc);
+        glDetachShader(program, tc);
+    }
+
+    if (!TEShader.empty())
+    {
+        glDeleteShader(te);
+        glDetachShader(program, te);
+    }
+
+    if (!geometryShader.empty())
+    {
+        glDeleteShader(gs);
+        glDetachShader(program, gs);
+    }
 
     return program;
 }

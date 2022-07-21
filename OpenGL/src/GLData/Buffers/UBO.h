@@ -33,6 +33,7 @@ public:
 	void emplaceData(T& element);
 	void setSubData(T&& element, size_t indx);
 	void setSubData(T& element, size_t indx);
+	T& getElementAt(size_t indx);
 
 	void Update();
 
@@ -132,6 +133,22 @@ inline void UBO<T>::setSubData(T& element, size_t indx)
 {
 	data.at(indx) = element;
 	isUpdated = true;
+}
+
+/**
+ * Method that wraps an .at() call on the underlying vector, it allows
+ * the utilization of an UBO class when T is a struct, by allowing the 
+ * user to access the underlying struct and modify its members, to do so,
+ * it must break encapsulation.
+ * 
+ * \param indx index of the item to fetch
+ * \return a Reference to the item at index indx
+ */
+template<typename T>
+inline T& UBO<T>::getElementAt(size_t indx)
+{
+	isUpdated = true;
+	return data.at(indx);	//we MUST assume that the data has changed, even if it's not the case.
 }
 
 template<typename T>

@@ -107,7 +107,7 @@
     <Image Include="res\textures\Grass.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\textures\Bricks512x512.jpg">
+    <Image Include="res\textures\Bricks.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -243,7 +243,7 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <None Include="res\shaders\Normals.shader" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\textures\Bricks512x512.jpg" />
+    <Image Include="res\textures\Bricks.jpg" />
     <Image Include="res\textures\Grass.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

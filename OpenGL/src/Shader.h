@@ -12,6 +12,9 @@ struct ShaderProgramSource
 {
 	std::string VertexSource;
 	std::string FragmentSource;
+	std::string TCSource;
+	std::string TESource;
+	std::string GeometrySource;
 };
 
 
@@ -25,14 +28,18 @@ private:
 	std::unordered_map<std::string, int> m_UniformLocationCache;
 public:
 
-	Shader(const std::string& filepath);
+	explicit Shader(const std::string& filepath);
 	~Shader();
 
 	void Bind() const;
 	void Unbind() const;
 
 	GLuint CompileShader(GLuint type, const std::string& source);
-	GLuint CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
+	GLuint CreateShader(const std::string& vertexShader, const std::string& fragmentShader,
+		std::string const& TCShader,
+		std::string const& TEShader,
+		std::string const& geometryShader
+	);
 	ShaderProgramSource ParseShader();
 	/*
 		Uniforms
