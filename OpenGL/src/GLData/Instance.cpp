@@ -33,7 +33,7 @@ glm::mat4 Instance::getTransMatrix()
 	return displacement;
 }
 
-glm::mat3 Instance::getNormalMatrix()
+glm::mat4 Instance::getNormalMatrix()
 {
 	updateModelMatrix();
 	return nMatrix;
@@ -70,7 +70,8 @@ void Instance::updateModelMatrix()
 		}
 
 		mMatrix = displacement * (rotation * scaling);
-		nMatrix = glm::inverseTranspose(glm::mat3(mMatrix));
+		nMatrix = glm::mat4(glm::inverseTranspose(glm::mat3(mMatrix)));
+
 		
 #if defined(_DEBUG) && PRINT_MATRICES
 		std::cout << glm::to_string(rotation) << std::endl;

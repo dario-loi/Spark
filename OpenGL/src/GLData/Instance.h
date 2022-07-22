@@ -9,7 +9,7 @@ private:
 	std::shared_ptr<Model> objModel;
 
 	glm::mat4 mMatrix;
-	glm::mat3 nMatrix;
+	glm::mat4 nMatrix;
 
 	glm::mat4 displacement;
 	glm::mat4 rotation;
@@ -36,7 +36,7 @@ public:
 
 	std::shared_ptr<Model> getModel() const { return objModel; };
 	glm::mat4 getModelMatrix();
-	glm::mat3 getNormalMatrix();
+	glm::mat4 getNormalMatrix();
 	glm::mat4 getTransMatrix();
 	void updateModelMatrix();
 

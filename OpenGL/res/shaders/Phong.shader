@@ -10,7 +10,7 @@ layout(location = 2) out vec3 curr_pos;
 
 /* Uniform Matrices*/
 uniform mat4 u_mMatrix;		 //Model Matrix
-uniform mat3 u_normalMatrix; //Normal Matrix
+uniform mat4 u_normalMatrix; //Normal Matrix
 
 layout(binding = 2, std140) uniform cameraUBO
 {
@@ -24,8 +24,10 @@ layout(binding = 2, std140) uniform cameraUBO
 void main()
 {
 	
+	mat3 customNormal = transpose(inverse(mat3(u_mMatrix)));
+
 	//Normalize + Translate Normals
-	v_Normal = mat3(u_mMatrix) * normal;
+	v_Normal = mat3(u_normalMatrix) * normal;
 
 	//Texture Coordinates Passthrough
 	v_TexCoord = text_coord;
@@ -104,7 +106,7 @@ vec3 specular_gauss(vec3 normal, float attenuation, vec3 light_dir, vec3 frag_po
 {
 	vec3 halfway = normalize(view_dir + light_dir);
 
-	const float shininess = 0.5f;
+	const float shininess = 0.8f;
 
 	float angle = acos(max(dot(normal, halfway), 0.0f));
 

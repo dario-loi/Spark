@@ -251,6 +251,8 @@ int main(void)
         UBO camera_data{ std::move(cam_mat), 2 };
         camera_data.Bind();
         
+        std::cout << sizeof(glm::mat3);
+
         /* Loop until the user closes the window */
         
         float lastFrame = 0.0f;
@@ -307,8 +309,9 @@ int main(void)
 
                 shader.SetUniform1i("u_Texture", 0);
                 shader.SetUniform1i("u_Specular", 1);
+                shader.setUniform4mat("u_normalMatrix", inst.getNormalMatrix());
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
-                shader.setUniform3mat("u_normalMatrix", inst.getNormalMatrix());
+                
 
                 inst.Draw();
 
