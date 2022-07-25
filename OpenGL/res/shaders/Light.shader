@@ -5,6 +5,7 @@ layout(location = 0) in vec4 position;
 out vec3 v_TexCoord;
 
 uniform mat4 u_mMatrix;
+uniform mat4 u_normalMatrix;
 
 layout(binding = 2, std140) uniform cameraUBO
 {

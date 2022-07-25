@@ -115,7 +115,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(width, height, "D-Engine", nullptr, nullptr);
+    window = glfwCreateWindow(width, height, "Spark", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -158,21 +158,24 @@ int main(void)
 
     
     {
-        /*
-        Model tank = importObj("res/model/tank/source/tank.obj");
+
+        Model robot = importObj("res/model/robot/source/robot.obj");
             
-        tank.getVAO().add_attr<float>(3); //Position
-        tank.getVAO().add_attr<float>(3); //Normal
-        tank.getVAO().add_attr<float>(2); //Texture
-        tank.ModelInit();
-        */
+        robot.getVAO().add_attr<float>(3); //Position
+        robot.getVAO().add_attr<float>(3); //Normal
+        robot.getVAO().add_attr<float>(2); //Texture
+        robot.getVAO().add_attr<float>(3); //Tangent
+        robot.ModelInit();
+
 
         Model cube = importObj("res/model/cube/cube.obj");
         cube.getVAO().add_attr<float>(3); //Position
         cube.getVAO().add_attr<float>(3); //Normal
         cube.getVAO().add_attr<float>(2); //Texture
+        cube.getVAO().add_attr<float>(3); //Tangent
         cube.ModelInit();
-        
+
+
         /*
             Create Instances
         */
@@ -180,16 +183,16 @@ int main(void)
         //Randomly gen INSTANCES instances
         std::vector<Instance> instances;
 
-        constexpr const unsigned int INSTANCES = 1000;
+        constexpr const unsigned int INSTANCES = 1;
 
         instances.reserve(INSTANCES);
 
         {
-            auto model_ptr = std::make_shared<Model>(cube);
+            auto model_ptr = std::make_shared<Model>(robot);
             auto gen = RandomGenerator::getGenerator();
-            auto dist = RandomGenerator::getRealDistribution(-20.f, 20.f);
-            auto dist_scale = RandomGenerator::getRealDistribution(0.5f, 1.5f);
-            auto dist_rot = RandomGenerator::getRealDistribution(0.f, 359.9f);
+            auto dist = RandomGenerator::getRealDistribution(-25.f, 25.f);
+            //auto dist_scale = RandomGenerator::getRealDistribution(1.0f, 1.0f);
+            //auto dist_rot = RandomGenerator::getRealDistribution(0.f, 359.9f);
 
             for (int c = 0; c < INSTANCES; ++c)
             {
@@ -197,9 +200,9 @@ int main(void)
                     dist(gen), dist(gen), dist(gen)
                 );
 
-                instances.emplace_back(model_ptr, position);
-                instances.at(c).Rotate(glm::vec3(dist_rot(gen), dist_rot(gen), dist_rot(gen)));
-                instances.at(c).Scale(glm::vec3(dist_scale(gen)));
+                instances.emplace_back(model_ptr);
+                instances.at(c).Rotate(glm::vec3(180.0f, 0.0f, 0.0f));
+                instances.at(c).Scale(glm::vec3(1.0f));
             }
         }
 
@@ -209,16 +212,16 @@ int main(void)
 
         for (size_t i = 0; i < NUM_LIGHTS; ++i)
         {
-            lights.push_back({ std::make_shared<Model>(cube), { 5.0f , -10.0f, 0.0f - (static_cast<float>(i)) * 4.0f } });
+            lights.push_back({ std::make_shared<Model>(cube), { 5.0f , -25.0f, 0.0f - (static_cast<float>(i)) * 4.0f } });
         }
 
         /*
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices)
         */
+        auto robot_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        auto robot_spec = Texture("res/model/robot/textures/specular.jpeg", GL_TEXTURE_2D, GL_RGBA8);
+        auto robot_norm = Texture("res/model/robot/textures/normals.jpg", GL_TEXTURE_2D, GL_RGBA8);
 
-        //auto tank_tex = Texture("res/model/tank/textures/tank_texture.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
-        auto cube_tex = Texture("res/textures/Grass.png", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
-        auto cube_spec = Texture("res/textures/Grass_spec.png", GL_TEXTURE_2D, GL_RGBA8);
         /*
             Init Shader
         */
@@ -289,6 +292,12 @@ int main(void)
 
                 light_shader.setUniform4mat("u_mMatrix", light.getModelMatrix());
 
+               /* light.Move(
+                    glm::vec3(
+                        0.01f + (0.02f * ((int) indx - 1)), 0.0f, 0.0f
+                    )
+                );*/
+
                 light_positions.Bind();
                 light_positions.setSubData(glm::vec4(light.getTransform().vDisplacement.vector, 1.0f), indx++);
                 
@@ -302,17 +311,21 @@ int main(void)
             shader.Bind();
 
             instances[0].getModel()->Bind();
-            cube_tex.Bind(0);
-            cube_spec.Bind(1);
+            robot_tex.Bind(0);
+            robot_spec.Bind(1);
+            robot_norm.Bind(2);
+
+            shader.SetUniform1i("u_Texture", 0);
+            shader.SetUniform1i("u_Specular", 1);
+            shader.SetUniform1i("u_NormalMap", 2);
+
             for (auto& inst : instances)
             {
 
-                shader.SetUniform1i("u_Texture", 0);
-                shader.SetUniform1i("u_Specular", 1);
                 shader.setUniform4mat("u_normalMatrix", inst.getNormalMatrix());
                 shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
                 
-
+                inst.Rotate({ 0.0f, 0.1f, 0.0f });
                 inst.Draw();
 
                 ++inst_indx;
