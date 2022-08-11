@@ -51,9 +51,9 @@ MessageCallback(GLenum source,
     const GLchar* message,
     const void* userParam)
 {
-    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, source = 0x%x, message = %s\n",
         (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-        type, severity, message);
+        type, severity, source, message);
 }
 
 constexpr const int width = 1280;
@@ -62,7 +62,7 @@ constexpr const int height = 720;
 float lastX = width / 2;
 float lastY = height / 2;
 
-Camera cam(1000.0f, 4 / 3, 2.5f);
+Camera cam(1000.0f, 4 / 3, 5.0f);
 
 
 void processInput(GLFWwindow* window, Camera* camera)
@@ -114,6 +114,10 @@ int main(void)
 
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(width, height, "Spark", nullptr, nullptr);
     if (!window)
@@ -156,9 +160,8 @@ int main(void)
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, nullptr);
 
-    
     {
-
+        /*
         Model robot = importObj("res/model/robot/source/robot.obj");
             
         robot.getVAO().add_attr<float>(3); //Position
@@ -166,7 +169,7 @@ int main(void)
         robot.getVAO().add_attr<float>(2); //Texture
         robot.getVAO().add_attr<float>(3); //Tangent
         robot.ModelInit();
-
+        */
 
         Model cube = importObj("res/model/cube/cube.obj");
         cube.getVAO().add_attr<float>(3); //Position
@@ -183,16 +186,16 @@ int main(void)
         //Randomly gen INSTANCES instances
         std::vector<Instance> instances;
 
-        constexpr const unsigned int INSTANCES = 1;
+        constexpr const unsigned int INSTANCES = 1000;
 
         instances.reserve(INSTANCES);
 
         {
-            auto model_ptr = std::make_shared<Model>(robot);
+            auto model_ptr = std::make_shared<Model>(cube);
             auto gen = RandomGenerator::getGenerator();
-            auto dist = RandomGenerator::getRealDistribution(-25.f, 25.f);
-            //auto dist_scale = RandomGenerator::getRealDistribution(1.0f, 1.0f);
-            //auto dist_rot = RandomGenerator::getRealDistribution(0.f, 359.9f);
+            auto dist = RandomGenerator::getRealDistribution(-50.f, 50.f);
+            auto dist_scale = RandomGenerator::getRealDistribution(0.75f, 1.25f);
+            auto dist_rot = RandomGenerator::getRealDistribution(0.f, 359.9f);
 
             for (int c = 0; c < INSTANCES; ++c)
             {
@@ -200,9 +203,9 @@ int main(void)
                     dist(gen), dist(gen), dist(gen)
                 );
 
-                instances.emplace_back(model_ptr);
-                instances.at(c).Rotate(glm::vec3(180.0f, 0.0f, 0.0f));
-                instances.at(c).Scale(glm::vec3(1.0f));
+                instances.emplace_back(model_ptr, position);
+                instances.at(c).Rotate(glm::vec3(dist_rot(gen), dist_rot(gen), dist_rot(gen)));
+                instances.at(c).Scale(glm::vec3(dist_scale(gen), dist_scale(gen), dist_scale(gen)));
             }
         }
 
@@ -218,9 +221,9 @@ int main(void)
         /*
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices)
         */
-        auto robot_tex = Texture("res/model/robot/textures/texture.jpg", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
-        auto robot_spec = Texture("res/model/robot/textures/specular.jpeg", GL_TEXTURE_2D, GL_RGBA8);
-        auto robot_norm = Texture("res/model/robot/textures/normals.jpg", GL_TEXTURE_2D, GL_RGBA8);
+        auto robot_tex  = Texture("res/textures/grass.bmp", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
+        auto robot_spec = Texture("res/textures/grass_spec.bmp", GL_TEXTURE_2D, GL_RGBA8);
+        auto robot_norm = Texture("res/textures/grass_normal.bmp", GL_TEXTURE_2D, GL_RGBA8);
 
         /*
             Init Shader

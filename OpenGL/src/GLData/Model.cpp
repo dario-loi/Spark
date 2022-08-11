@@ -1,33 +1,32 @@
 #include "Model.h"
 
 Model::Model(std::vector<float>&& vertices, std::vector<unsigned int>&& indices)
-	: m_Vbo(std::move(vertices)), m_Ebo(std::move(indices)), m_Vao(++Model::free_idx)
+	: m_Vbo(std::move(vertices)), m_Ebo(std::move(indices))
 {
 }
 
 Model::~Model() = default;
 
-
-
-void Model::Bind()
+void Model::Bind() const
 {
-	m_Vbo.Bind();
-	m_Ebo.Bind();
 	m_Vao.Bind();
 }
 
-void Model::Unbind()
+void Model::Unbind() const
 {
-	m_Vbo.Unbind();
-	m_Ebo.Unbind();
 	m_Vao.Unbind();
+
 }
 
-void Model::ModelInit()
+void Model::ModelInit() const
 {
-	Bind();
+	m_Vao.Bind();
+	m_Ebo.Bind();
+	m_Vbo.Bind();
 	m_Vao.init_VAO();
-	Unbind();
+	m_Vao.Unbind();
+	m_Ebo.Unbind();
+	m_Vbo.Unbind();
 }
 
 VAO& Model::getVAO()
@@ -52,8 +51,6 @@ std::vector<float> const& Model::getBufferReference() const
 }
 
 
-
-
 size_t Model::getIndexSize() const
 {
 	return m_Ebo.getSize();
@@ -68,5 +65,3 @@ VBO const& Model::getVBO() const
 {
 	return m_Vbo;
 }
-
-size_t Model::free_idx = 0;

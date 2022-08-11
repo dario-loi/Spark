@@ -8,8 +8,6 @@ private:
 	
 	unsigned int RenderID;
 	unsigned int stride;
-	size_t indx;
-	bool isBound;
 
 	struct attribute {
 
@@ -18,10 +16,7 @@ private:
 		GLenum type;
 
 		attribute(unsigned int size, unsigned int count, GLenum type)
-			: size(size), count(count), type(type)
-		{
-
-		}
+			: size(size), count(count), type(type) { }
 	};
 
 	std::vector<attribute> attributes;
@@ -32,10 +27,10 @@ public:
 	void add_attr(unsigned int count);
 	void init_VAO() const;
 
-	void Bind();
-	void Unbind();
+	void Bind() const;
+	void Unbind() const;
 
-	explicit VAO(size_t index);
+	explicit VAO();
 	~VAO();
 };
 

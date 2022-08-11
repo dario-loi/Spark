@@ -89,8 +89,8 @@ uniform unsigned int nLights;
 
 /* Constants */
 
-const vec3 ambient_color = vec3(0.95f, 0.92f, 0.61f);
-const vec3 light_color = vec3(1.0f, 0.996f, 0.878f);
+const vec3 ambient_color = vec3(0.93f, 0.78f, 0.12f);
+const vec3 light_color = vec3(0.6f, 0.696f, 0.878f);
 
 vec3 ambient(float intensity, vec3 color)
 {
@@ -109,11 +109,11 @@ vec3 diffuse(vec3 normal, float attenuation, vec3 light_dir, float intensity, ve
 
 }
 
-vec3 specular(vec3 normal, float attenuation, vec3 light_dir, vec3 view_dir, float intensity, vec3 color)
+vec3 specular_blinn(vec3 normal, float attenuation, vec3 light_dir, vec3 view_dir, float intensity, vec3 color)
 {
 	
 	vec3 halfway = normalize(view_dir + light_dir);
-	float specular_intensity = (intensity * pow(max(dot(normal, halfway), 0.0f), 64)) / attenuation;
+	float specular_intensity = (intensity * pow(max(dot(normal, halfway), 0.0f), 256)) / attenuation;
 
 	return specular_intensity * color;
 }
@@ -124,12 +124,12 @@ vec3 specular_gauss(vec3 normal, float attenuation, vec3 light_dir, vec3 view_di
 
 	float incidence = clamp(dot(normal, light_dir), 0.0f, 1.0f);
 
-	const float shininess = 0.75f;
+	const float shininess = 0.01f;
 
-	float angle = acos(max(dot(normal, halfway), 0.0f));
+	float angle = acos(clamp(dot(normal, halfway), 0.0f, 1.0f));
 
-	float exponent = -(pow(angle / shininess, 2));
-	float specular_intensity = exp(exponent);
+	float exponent = (pow(angle / shininess, 2));
+	float specular_intensity = exp(-exponent) / attenuation;
 
 	specular_intensity = (incidence != 0.0f) ? specular_intensity : 0.0f;
 
@@ -151,7 +151,7 @@ void main()
 
 	vec3 a_light = vec3(0.0f), d_light = vec3(0.0f), s_light = vec3(0.0f);
 
-	a_light = ambient(0.01f, ambient_color);
+	a_light = ambient(0.05f, ambient_color);
 
 	vec3 view_dir = normalize(camera_pos - fs_in.curr_pos);
 
@@ -171,6 +171,6 @@ void main()
 		s_light += specular_gauss(norm, attenuation, light_dir, view_dir, 1.0f, light_color);
 	}
 
-	color = vec4(tex_col * ((a_light + d_light + (spec_comp * s_light))), 1.0f); //
+	color = vec4(tex_col * (a_light + d_light + (spec_comp * s_light)), 1.0f); //
 
 }

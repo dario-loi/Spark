@@ -12,11 +12,6 @@ Texture::Texture(std::string const& filename, const GLenum texType, const GLenum
 	stbi_set_flip_vertically_on_load(1);
 	imageBuffer = stbi_load(filename.c_str(), &imgWidth, &imgHeight, &BitDepth, BitDepth);
 
-	if(!glIsEnabled(texType))
-	{
-		glEnable(texType);
-	}
-	
 	glGenTextures(1, &RenderID);
 	
 	if (!imageBuffer)

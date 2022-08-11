@@ -7,6 +7,7 @@ out vec3 v_TexCoord;
 uniform mat4 u_mMatrix;
 uniform mat4 u_normalMatrix;
 
+
 layout(binding = 2, std140) uniform cameraUBO
 {
 
@@ -26,8 +27,11 @@ void main()
 #version 420 core
 layout(location = 0) out vec4 color;
 
+const vec3 light_color = vec3(0.6f, 0.696f, 0.878f);
+
+
 void main()
 {
 
-	color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	color = vec4(light_color, 1.0f);
 }

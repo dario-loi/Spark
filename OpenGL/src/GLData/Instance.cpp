@@ -104,7 +104,7 @@ void Instance::Draw() const
 {
 
 	glDrawElements(GL_TRIANGLES, (GLsizei)objModel->getIndexSize(), 
-					GL_UNSIGNED_INT, const_cast<GLuint*>(objModel->getIndexReference().data()));
+					GL_UNSIGNED_INT, nullptr);
 }
 
 void Instance::setPos(const glm::vec3& dVec)
