@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC;GLM_FORCE_DEFAULT_ALIGNED_GENTYPES;GLM_FORCE_SIMD_AVX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;$(SolutionDir)OpenGL\res\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)OpenGL\res\vendor\imgui;$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;$(SolutionDir)OpenGL\res\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -174,7 +174,7 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;$(SolutionDir)OpenGL\res\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)OpenGL\res\vendor\imgui;$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;$(SolutionDir)OpenGL\res\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
@@ -206,6 +206,13 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="res\vendor\imgui\imgui.cpp" />
+    <ClCompile Include="res\vendor\imgui\imgui_demo.cpp" />
+    <ClCompile Include="res\vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="res\vendor\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="res\vendor\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="res\vendor\imgui\imgui_tables.cpp" />
+    <ClCompile Include="res\vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Controllers\RandomGenerator.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\GLData\Instance.cpp" />
@@ -220,6 +227,15 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\Utility\Importer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="res\vendor\imgui\imconfig.h" />
+    <ClInclude Include="res\vendor\imgui\imgui.h" />
+    <ClInclude Include="res\vendor\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="res\vendor\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="res\vendor\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="res\vendor\imgui\imgui_internal.h" />
+    <ClInclude Include="res\vendor\imgui\imstb_rectpack.h" />
+    <ClInclude Include="res\vendor\imgui\imstb_textedit.h" />
+    <ClInclude Include="res\vendor\imgui\imstb_truetype.h" />
     <ClInclude Include="res\vendor\OBJ_Loader.h" />
     <ClInclude Include="res\vendor\tiny_obj_loader.h" />
     <ClInclude Include="src\Controllers\RandomGenerator.h" />
