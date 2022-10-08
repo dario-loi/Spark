@@ -258,4 +258,4 @@ paket-files/
 *.ipch
 *.db
 OpenGL/res/vendor/imgui-1.88.zip
-OpenGL/res/vendor/imgui-1.88/
+OpenGL/res/vendor/imgui-1.88/imgui-1.88/.editorconfig
