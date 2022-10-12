@@ -48,8 +48,6 @@ private:
 
 	Properties properties;
 
-
-
 };
 
 }

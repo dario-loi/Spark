@@ -14,7 +14,7 @@
 #include "tiny_obj_loader.h"
 
 
-spark::Model importObj(std::string const& filename)
+spark::Model sparkutil::importObj(std::string const& filename)
 {
     struct Vertex
     {
@@ -63,7 +63,7 @@ spark::Model importObj(std::string const& filename)
         explicit(false) indx_orderable(tinyobj::index_t i) : indx(i) {}
     };
 
-    //If this is not true, Nasal Demons.
+    //If this is not true, Nasal Demons, should be true since Vertex is POD.
     static_assert(sizeof(Vertex) == (sizeof(float) * 11));
 
     tinyobj::attrib_t attributes;
