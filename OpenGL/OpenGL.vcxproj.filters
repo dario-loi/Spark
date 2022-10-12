@@ -45,9 +45,6 @@
     <ClCompile Include="src\GLData\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Controllers\RandomGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utility\Importer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,7 +72,7 @@
     <ClCompile Include="src\Spark\SparkObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Spark\SparkMaterial.cpp">
+    <ClCompile Include="src\Spark\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,7 +104,7 @@
     <ClInclude Include="src\GLData\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Controllers\RandomGenerator.h">
+    <ClInclude Include="src\Utility\RandomGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="res\vendor\OBJ_Loader.h">
@@ -152,7 +149,10 @@
     <ClInclude Include="src\Spark\SparkObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Spark\SparkMaterial.h">
+    <ClInclude Include="src\Spark\SparkConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Spark\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

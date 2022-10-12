@@ -213,9 +213,6 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClCompile Include="res\vendor\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="res\vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="res\vendor\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Spark\SparkMaterial.cpp" />
-    <ClCompile Include="src\Spark\SparkObject.cpp" />
-    <ClCompile Include="src\Controllers\RandomGenerator.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\GLData\Instance.cpp" />
     <ClCompile Include="src\GLData\Model.cpp" />
@@ -226,6 +223,8 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClCompile Include="src\GLData\Buffers\VBO.cpp" />
     <ClCompile Include="src\GLData\Buffers\VAO.cpp" />
     <ClCompile Include="src\GLData\Texture.cpp" />
+    <ClCompile Include="src\Spark\ResourceManager.cpp" />
+    <ClCompile Include="src\Spark\SparkObject.cpp" />
     <ClCompile Include="src\Utility\Importer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -240,7 +239,7 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClInclude Include="res\vendor\imgui\imstb_truetype.h" />
     <ClInclude Include="res\vendor\OBJ_Loader.h" />
     <ClInclude Include="res\vendor\tiny_obj_loader.h" />
-    <ClInclude Include="src\Controllers\RandomGenerator.h" />
+    <ClInclude Include="src\Utility\RandomGenerator.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\GLData\Buffers\UBO.h" />
     <ClInclude Include="src\GLData\Instance.h" />
@@ -251,7 +250,8 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\GLData\Buffers\VBO.h" />
     <ClInclude Include="src\GLData\Buffers\VAO.h" />
     <ClInclude Include="src\GLData\Texture.h" />
-    <ClInclude Include="src\Spark\SparkMaterial.h" />
+    <ClInclude Include="src\Spark\ResourceManager.h" />
+    <ClInclude Include="src\Spark\SparkConfig.h" />
     <ClInclude Include="src\Spark\SparkObject.h" />
     <ClInclude Include="src\Utility\Importer.h" />
   </ItemGroup>
