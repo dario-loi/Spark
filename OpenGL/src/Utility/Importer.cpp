@@ -14,7 +14,7 @@
 #include "tiny_obj_loader.h"
 
 
-Model importObj(std::string const& filename)
+spark::Model importObj(std::string const& filename)
 {
     struct Vertex
     {
@@ -203,5 +203,5 @@ Model importObj(std::string const& filename)
     std::vector<float> raw_verts(verts.size() * sizeof(Vertex));
     memcpy(raw_verts.data(), verts.data(), verts.size() * sizeof(Vertex)); //pray for the best.
 
-    return Model(std::move(raw_verts), std::move(indices));
+    return spark::Model(std::move(raw_verts), std::move(indices));
 }   

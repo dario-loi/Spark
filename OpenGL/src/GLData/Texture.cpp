@@ -5,7 +5,7 @@
 
 #include "..\..\res\vendor\stb_image.h"
 
-Texture::Texture(std::string const& filename, const GLenum texType, const GLenum texEnc)
+spark::Texture::Texture(std::string const& filename, const GLenum texType, const GLenum texEnc)
 	: RenderID(0), currChannel(0),  imgWidth(0), imgHeight(0), BitDepth(4), texType(texType), texEnc(texEnc)
 {
 
@@ -26,7 +26,7 @@ Texture::Texture(std::string const& filename, const GLenum texType, const GLenum
 	Unbind();
 }
 
-Texture::~Texture()
+spark::Texture::~Texture()
 {
 	Unbind();
 	stbi_image_free(imageBuffer);
@@ -37,7 +37,7 @@ Texture::~Texture()
 *
 *  \return void
 */
-void Texture::initTexture() const
+void spark::Texture::initTexture() const
 {
 	switch (texType)
 	{
@@ -81,7 +81,7 @@ void Texture::initTexture() const
 }
 
 
-void Texture::Bind(unsigned int channel) const
+void spark::Texture::Bind(unsigned int channel) const
 {
 	if (int TexSlot = GL_TEXTURE0 + channel; TexSlot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
 	{
@@ -96,7 +96,7 @@ void Texture::Bind(unsigned int channel) const
 	glBindTexture(texType, RenderID);
 }
 
-void Texture::Unbind() const
+void spark::Texture::Unbind() const
 {
 	glBindTexture(texType, 0);
 	glDisable(texType);

@@ -6,7 +6,7 @@
 #include <gtx/string_cast.hpp>
 #include "gtc/matrix_inverse.hpp"
 
-Instance::Instance(std::shared_ptr<Model> object_model, glm::vec3 position)
+spark::Instance::Instance(std::shared_ptr<Model> object_model, glm::vec3 position)
 	: objModel(object_model), mMatrix(1.0f), nMatrix(1.0f), displacement(1.0f), rotation(1.0f), scaling(1.0f)
 {
 	trans.vDisplacement.vector = position;
@@ -20,26 +20,26 @@ Instance::Instance(std::shared_ptr<Model> object_model, glm::vec3 position)
 	updateModelMatrix();
 }
 
-glm::mat4 Instance::getModelMatrix()
+glm::mat4 spark::Instance::getModelMatrix()
 {
 	updateModelMatrix();
 	return mMatrix;
 }
 
 
-glm::mat4 Instance::getTransMatrix()
+glm::mat4 spark::Instance::getTransMatrix()
 {
 	updateModelMatrix();
 	return displacement;
 }
 
-glm::mat4 Instance::getNormalMatrix()
+glm::mat4 spark::Instance::getNormalMatrix()
 {
 	updateModelMatrix();
 	return nMatrix;
 }
 
-void Instance::updateModelMatrix()
+void spark::Instance::updateModelMatrix()
 {
 	if (trans.vScale.isUpdated || trans.vRotation.isUpdated || trans.vDisplacement.isUpdated)
 	{
@@ -82,44 +82,44 @@ void Instance::updateModelMatrix()
 	}
 }
 
-void Instance::Move(const glm::vec3& dVec)
+void spark::Instance::Move(const glm::vec3& dVec)
 {
 	trans.vDisplacement.vector += dVec;
 	trans.vDisplacement.isUpdated = true;
 }
 
-void Instance::Rotate(const glm::vec3& rVec)
+void spark::Instance::Rotate(const glm::vec3& rVec)
 {
 	trans.vRotation.vector += rVec;
 	trans.vRotation.isUpdated = true;
 }
 
-void Instance::Scale(const glm::vec3& sVec)
+void spark::Instance::Scale(const glm::vec3& sVec)
 {
 	trans.vScale.vector *= sVec;
 	trans.vScale.isUpdated = true;
 }
 
-void Instance::Draw() const
+void spark::Instance::Draw() const
 {
 
 	glDrawElements(GL_TRIANGLES, (GLsizei)objModel->getIndexSize(), 
 					GL_UNSIGNED_INT, nullptr);
 }
 
-void Instance::setPos(const glm::vec3& dVec)
+void spark::Instance::setPos(const glm::vec3& dVec)
 {
 	trans.vDisplacement.vector = dVec;
 	trans.vDisplacement.isUpdated = true;
 }
 
-void Instance::setRot(glm::vec3 const& rVec)
+void spark::Instance::setRot(glm::vec3 const& rVec)
 {
 	trans.vRotation.vector = rVec;
 	trans.vRotation.isUpdated = true;
 }
 
-void Instance::setScale(glm::vec3 const& sVec)
+void spark::Instance::setScale(glm::vec3 const& sVec)
 {
 	trans.vScale.vector = sVec;
 	trans.vScale.isUpdated = true;

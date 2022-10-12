@@ -213,6 +213,8 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClCompile Include="res\vendor\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="res\vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="res\vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Spark\SparkMaterial.cpp" />
+    <ClCompile Include="src\Spark\SparkObject.cpp" />
     <ClCompile Include="src\Controllers\RandomGenerator.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\GLData\Instance.cpp" />
@@ -249,6 +251,8 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
     <ClInclude Include="src\GLData\Buffers\VBO.h" />
     <ClInclude Include="src\GLData\Buffers\VAO.h" />
     <ClInclude Include="src\GLData\Texture.h" />
+    <ClInclude Include="src\Spark\SparkMaterial.h" />
+    <ClInclude Include="src\Spark\SparkObject.h" />
     <ClInclude Include="src\Utility\Importer.h" />
   </ItemGroup>
   <ItemGroup>

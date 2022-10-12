@@ -3,6 +3,8 @@
 #include "GL/glew.h"
 
 
+namespace spark
+{
 
 class Texture
 {
@@ -28,3 +30,4 @@ private:
 	void initTexture() const;
 };
 
+}

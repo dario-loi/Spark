@@ -4,5 +4,5 @@
 #include "../GLData/Model.h"
 
 
-Model importObj(std::string const& filename);
+spark::Model importObj(std::string const& filename);
 
