@@ -5,8 +5,10 @@
 
 #include "..\..\res\vendor\stb_image.h"
 
-spark::Texture::Texture(std::string const& filename, const GLenum texType, const GLenum texEnc)
-	: RenderID(0), currChannel(0),  imgWidth(0), imgHeight(0), BitDepth(4), texType(texType), texEnc(texEnc)
+spark::Texture::Texture(boost::uuids::uuid UUID_, std::string const& name_,
+	std::string const& filename, const GLenum texType, const GLenum texEnc, spark::SparkTextureType type_)
+	: UUID(UUID_), name(name_), RenderID(0), currChannel(0), 
+	imgWidth(0), imgHeight(0), BitDepth(4), texType(texType), texEnc(texEnc), sparkType(type_)
 {
 
 	stbi_set_flip_vertically_on_load(1);
@@ -21,11 +23,13 @@ spark::Texture::Texture(std::string const& filename, const GLenum texType, const
 	}
 
 	initTexture();
-
-	
 	Unbind();
 }
 
+/**
+ * Frees the stbi buffer.
+ * 
+ */
 spark::Texture::~Texture()
 {
 	Unbind();
@@ -80,7 +84,6 @@ void spark::Texture::initTexture() const
 	}
 }
 
-
 void spark::Texture::Bind(unsigned int channel) const
 {
 	if (int TexSlot = GL_TEXTURE0 + channel; TexSlot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
@@ -101,4 +104,3 @@ void spark::Texture::Unbind() const
 	glBindTexture(texType, 0);
 	glDisable(texType);
 }
-

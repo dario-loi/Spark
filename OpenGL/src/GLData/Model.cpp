@@ -1,11 +1,10 @@
 #include "Model.h"
+#include "boost/uuid/uuid.hpp"
 
-spark::Model::Model(std::vector<float> && vertices, std::vector<unsigned int> && indices)
-	: m_Vbo(std::move(vertices)), m_Ebo(std::move(indices))
+spark::Model::Model(boost::uuids::uuid UUID_, std::string const& name_, std::vector<float>&& vertices, std::vector<unsigned int>&& indices)
+	: UUID(UUID_), m_Vbo(std::move(vertices)), m_Ebo(std::move(indices)), name(name_)
 {
 }
-
-spark::Model::~Model() = default;
 
 void spark::Model::Bind() const
 {
@@ -48,6 +47,21 @@ std::vector<unsigned int> const& spark::Model::getIndexReference() const
 std::vector<float> const& spark::Model::getBufferReference() const
 {
 	return m_Vbo.getArray();
+}
+
+inline std::string spark::Model::getName() const
+{
+	return name;
+}
+
+inline const boost::uuids::uuid spark::Model::getUUID() const
+{
+	return UUID;
+}
+
+inline void spark::Model::setName(std::string const& name_)
+{
+	name = name_;
 }
 
 

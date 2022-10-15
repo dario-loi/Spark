@@ -31,12 +31,6 @@ void VAO::Unbind() const
 	glBindVertexArray(0);
 }
 
-template<typename T>
-void VAO::add_attr([[maybe_unused]] unsigned int count)
-{
-	static_assert(false);
-}
-
 template<>
 void VAO::add_attr<float>(unsigned int count)
 {
@@ -46,8 +40,8 @@ void VAO::add_attr<float>(unsigned int count)
 
 void VAO::init_VAO() const
 {
-	GLuint c = 0;
-	GLuint offset = 0;
+	GLuint c = 0u;
+	GLuint offset = 0u;
 	Bind();
 
 	for (const attribute& attr : attributes)

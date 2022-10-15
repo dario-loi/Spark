@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "glm.hpp"
 #include <memory>
+#include <string>
 
 namespace spark
 {
@@ -34,15 +35,17 @@ namespace spark
 
 	public:
 
-		Instance(std::shared_ptr<Model> object_model, glm::vec3 position = glm::vec3(0.0f));
+		Instance(std::shared_ptr<Model> object_model, glm::vec3 position = glm::vec3(0.0F));
 
-		std::shared_ptr<Model> getModel() const { return objModel; };
+		[[nodiscard]] std::shared_ptr<Model> getModel() const { return objModel; };
 		glm::mat4 getModelMatrix();
 		glm::mat4 getNormalMatrix();
 		glm::mat4 getTransMatrix();
 		void updateModelMatrix();
 
-		Transform getTransform() const { return trans; }
+		[[nodiscard]] std::string getModelName() const { return objModel->getName(); }
+
+		[[nodiscard]] Transform getTransform() const { return trans; }
 
 		void Move(glm::vec3 const& dVec);
 		void Rotate(glm::vec3 const& rVec);
@@ -54,5 +57,4 @@ namespace spark
 
 		void Draw() const;
 	};
-
 }

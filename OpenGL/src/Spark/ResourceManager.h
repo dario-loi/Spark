@@ -1,39 +1,66 @@
 #pragma once
+
+
+
+#include "SparkMultiIdxDefs.h"
+
 #include <vector>
-#include <boost/multi_index_container.hpp>
 #include <map>
-#include "../Utility/RandomGenerator.h"
-#include <stdint.h>
+#include <cstdint>
+#include <memory>
 
-class ResourceManager
+#include "vec4.hpp"
+
+#include "SparkConfig.h"
+#include "boost/uuid/uuid.hpp"
+#include "boost/uuid/name_generator.hpp"
+#include "SparkObject.h"
+#include "../GLData/Shader.h"
+
+namespace spark
 {
-public:
+	class ResourceManager
+	{
+	public:
 
-	/*
-	* Singleton
-	*/
-	static ResourceManager* const manager;
+		ResourceManager();
 
-private:
+		void spawnObject(std::shared_ptr<spark::Model>&& model, glm::vec4 const& position, std::string const& name);
+		void spawnObject(std::string const& model_name, glm::vec4 const& position, std::string const& name);
+		void spawnObject(boost::uuids::uuid model_UUID, glm::vec4 const& position, std::string const& name);
 
-	/*
-	* Singleton
-	*/
-	ResourceManager() = default;
-	~ResourceManager() = default;
-	ResourceManager(ResourceManager& /*other*/) = default;
-	ResourceManager operator=(ResourceManager& /*other*/) {};
+		/**
+		 * Gives the option to "Register" an orphaned model,
+		 * his should generally *not* be allowed and might be deprecated.
+		 */
 
-	/*
-	* Heavy-handed boost multi-index definition
-	* 
-	*/
-	using namespace boost;
+		void addModel(std::shared_ptr<spark::Model>&& model);
 
-	typedef 
-	
-	std::uniform_int_distribution<uint64_t> UUIDdistribution = 
-		sparkutils::RandomGenerator::randGen.getIntegerDistribution<uint64_t>(0ui64, UINT64_MAX);
-};
+		/**
+		 * Imports a Wavefront .Obj file into a model and registers
+		 * it into the manager's collections.
+		 */
+		void importModel(std::string const& model_path, std::string const& name);
+
+		/**
+		 * Loads a glsl shader to be used by Spark.
+		 */
+		void loadShader(std::string const& shader_path, std::string const& name);
 
 
+		void addTexture(std::string const& model_path, std::string const& name, SparkTextureType texType);
+
+	private:
+
+		std::vector<std::unique_ptr<spark::SparkObject>> lights;
+		std::vector<std::unique_ptr<spark::SparkObject>> transparents;
+
+		spark::SparkTextureContainer textures;
+		spark::SparkModelContainer models;
+		spark::SparkShaderContainer shaders;
+		spark::SparkObjContainer objMap;
+
+		boost::uuids::name_generator_sha1 UUIDgen;
+	};
+
+}

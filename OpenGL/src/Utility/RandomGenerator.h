@@ -1,37 +1,35 @@
 #pragma once
 #include <random>
-#include <stdint.h>
+#include <cstdint>
 
 namespace sparkutils
 {
-
-	class RandomGenerator
+	
+	class [[deprecated("DEPRECATED: doesn't have sufficient use cases and is superseded by boost::uuid")]] RandomGenerator
 	{
 
 	public:
 
-		static RandomGenerator randGen;
+		RandomGenerator() = default;
 
 		template<typename T>
-		std::uniform_real_distribution<T> getRealDistribution(const T from, const T to) 
+		static std::uniform_real_distribution<T> getRealDistribution(const T from, const T to) 
 		{ 
 			return std::uniform_real_distribution<T>(from, to);  
 		};
 
 		template<typename T>
-		std::uniform_int_distribution<T> getIntegerDistribution(const T from, const T to) 
+		static std::uniform_int_distribution<T> getIntegerDistribution(const T from, const T to)
 		{ 
 			return std::uniform_int_distribution<T>(from, to); 
 		};
 
-
-		auto getGenerator() { return mersenne; };
+		inline auto getGenerator() { return mersenne; };
 
 	private:
-		std::random_device device;
-		std::mt19937 mersenne;
-		RandomGenerator() : device(), mersenne(device) {};
+		std::mt19937_64 mersenne;
+		
 	};
 
-
+	static inline RandomGenerator randGen;
 }

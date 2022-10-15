@@ -23,7 +23,7 @@
 constexpr const char* glsl_version = "#version 130";
 
 //STDLIB
-#include <math.h>
+#include <cmath>
 #include <random>
 #include <algorithm>
 #include <memory>
@@ -31,7 +31,7 @@ constexpr const char* glsl_version = "#version 130";
 #include <array>
 #include <iostream>
 #include <filesystem>
-#include <time.h>
+#include <ctime>
 
 //Custom OpenGL Data Structures
 #include "GLData/Model.h"
@@ -40,8 +40,8 @@ constexpr const char* glsl_version = "#version 130";
 #include "GLData/Instance.h"
 #include "GLData/Texture.h"
 #include "Utility/Importer.h"
-#include "Controllers/RandomGenerator.h"
-#include "Shader.h"
+#include "Utility/RandomGenerator.h"
+#include "GLData/Shader.h"
 #include "Camera.h"
 
 
@@ -99,13 +99,13 @@ void processInput(GLFWwindow* window, Camera* camera)
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
 
-    float xoffset = lastX - xpos;
-    float yoffset = ypos  - lastY;
+    double xoffset = lastX - xpos;
+    double yoffset = ypos  - lastY;
 
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 0.1f;
+    const double sensitivity = 0.1f;
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
@@ -115,6 +115,9 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 
 int main(void)
 {
+
+    using namespace spark;
+    using namespace sparkutils;
 
     GLFWwindow* window;
     /* Initialize the library */
@@ -191,7 +194,7 @@ int main(void)
         robot.ModelInit();
         */
 
-        Model cube = importObj("res/model/cube/cube.obj");
+        Model cube = sparkutils::importObj("res/model/cube/cube.obj");
         cube.getVAO().add_attr<float>(3); //Position
         cube.getVAO().add_attr<float>(3); //Normal
         cube.getVAO().add_attr<float>(2); //Texture
@@ -212,10 +215,10 @@ int main(void)
 
         {
             auto model_ptr = std::make_shared<Model>(cube);
-            auto gen = RandomGenerator::getGenerator();
-            auto dist = RandomGenerator::getRealDistribution(-50.f, 50.f);
-            auto dist_scale = RandomGenerator::getRealDistribution(0.75f, 1.25f);
-            auto dist_rot = RandomGenerator::getRealDistribution(0.f, 359.9f);
+            auto gen = sparkutils::randGen.getGenerator();
+            auto dist = sparkutils::randGen.getRealDistribution(-50.f, 50.f);
+            auto dist_scale = sparkutils::randGen.getRealDistribution(0.75f, 1.25f);
+            auto dist_rot = sparkutils::randGen.getRealDistribution(0.f, 359.9f);
 
             for (int c = 0; c < INSTANCES; ++c)
             {

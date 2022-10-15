@@ -3,9 +3,16 @@
 #include "tiny_obj_loader.h"
 #include "../GLData/Model.h"
 
-namespace sparkutil
+namespace sparkutils
 {
 
-	spark::Model importObj(std::string const& filename);
+	struct SparkImportReturn
+	{
+		std::vector<float> verts;
+		std::vector<unsigned int> indx;
+	};
+
+
+	SparkImportReturn importObj(std::string const& filename);
 
 }

@@ -2,7 +2,7 @@
 #include "Importer.h"
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <algorithm>
 #include <map>
@@ -14,7 +14,7 @@
 #include "tiny_obj_loader.h"
 
 
-spark::Model sparkutil::importObj(std::string const& filename)
+sparkutils::SparkImportReturn sparkutils::importObj(std::string const& filename)
 {
     struct Vertex
     {
@@ -34,6 +34,8 @@ spark::Model sparkutil::importObj(std::string const& filename)
         float tl;
 
     };
+
+
 
     struct indx_orderable
     {
@@ -203,5 +205,5 @@ spark::Model sparkutil::importObj(std::string const& filename)
     std::vector<float> raw_verts(verts.size() * sizeof(Vertex));
     memcpy(raw_verts.data(), verts.data(), verts.size() * sizeof(Vertex)); //pray for the best.
 
-    return spark::Model(std::move(raw_verts), std::move(indices));
+    return { std::move(raw_verts), std::move(indices) };
 }   

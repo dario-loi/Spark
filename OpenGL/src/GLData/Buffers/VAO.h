@@ -23,8 +23,12 @@ private:
 	
 public:
 
-	template<typename T>
-	void add_attr(unsigned int count);
+	template<typename TYPE_NOT_SPECIFIED>
+	void add_attr(unsigned int const) = delete; //If we had reflection, I wouldn't be doing this :)
+
+	template<>
+	void add_attr<float>(unsigned int const count);
+
 	void init_VAO() const;
 
 	void Bind() const;
