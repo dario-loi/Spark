@@ -3,13 +3,13 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "SparkConfig.h"
-#include "..\Utility\Importer.cpp"
+#include "..\Utility\Importer.h"
 
 namespace spark 
 {
 
 	ResourceManager::ResourceManager()
-		: UUIDgen{}
+		: UUIDgen{spark::spark_UUID}
 	{
 		ImGui::Begin("Resource Manager");
 		ImGui::Text("This will have all sorts of awesome functionalities!");
@@ -46,21 +46,56 @@ namespace spark
 		models.emplace(std::move(model));
 	}
 
-	void ResourceManager::importModel(std::string const& model_path, std::string const& name)
+	void ResourceManager::importModel(std::string const& model_path, std::string const& name, SparkVAOLayouts layout_specifier)
 	{
-		auto ret = sparkutils::importObj(model_path);
 
-		models.emplace(UUIDgen(name), name, std::move(ret.verts), std::move(ret.indx));
+		auto ret = sparkutils::importObj(model_path);
+		Model mod{ UUIDgen(name), name, std::move(ret.verts), std::move(ret.indx) };
+		
+		if(layout_specifier & SparkVAOLayouts::HAS_POSITION)
+
+		models.emplace();
 	}
 
 	void ResourceManager::loadShader(std::string const& shader_path, std::string const& name)
 	{
 
-		shaders.emplace()
+		shaders.emplace(UUIDgen(name), shader_path, name);
 
 	}
 
+	void ResourceManager::addTexture(std::string const& texture_path, std::string const& name, SparkTextureType texType)
+	{
+		GLenum internalEncoding;
+		GLenum internalType;
 
+		switch (texType)
+		{
+		case SparkTextureType::DIFFUSE_MAP:
+			internalEncoding = GL_TEXTURE_2D;
+			internalType = GL_SRGB8_ALPHA8;
+			break;
+		case SparkTextureType::SPECULAR_MAP:
+			internalEncoding = GL_TEXTURE_2D;
+			internalType = GL_RGBA8;
+			break;
+		case SparkTextureType::NORMAL_MAP:
+			internalEncoding = GL_TEXTURE_2D;
+			internalType = GL_RGBA8;
+			break;
+		case SparkTextureType::EMISSIVE_MAP:
+			internalEncoding = GL_TEXTURE_2D;
+			internalType = GL_RGBA8;
+			break;
+		default:
+#ifdef _DEBUG
+			assert("SparkTextureType provided to Resource Manager does not exist");
+#endif // _DEBUG
+		}
+
+		textures.emplace(UUIDgen(name), name, texture_path,
+			internalType, internalEncoding, texType);
+	}
 
 }
 

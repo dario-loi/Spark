@@ -44,8 +44,15 @@ constexpr const char* glsl_version = "#version 130";
 #include "GLData/Shader.h"
 #include "Camera.h"
 
+//ResourceManager and Renderer
+#include "Spark/ResourceManager.h"
 
-#define LOG(x) std::cerr<<x<<std::endl;
+#ifdef _DEBUG
+#define LOG(x) std::clog<<(x)<<std::endl;
+#else  
+define LOG(x)  
+#endif
+
 /**
 *  \brief Callback function that defines debug behaviour. 
 *
@@ -71,9 +78,14 @@ constexpr const int height = 720;
 float lastX = width / 2;
 float lastY = height / 2;
 
+/*
+SHOULD NOT be global!
+*/
 Camera cam(1000.0f, 4 / 3, 5.0f);
 
-
+/*
+MUST be refactored, really ugly!
+*/
 void processInput(GLFWwindow* window, Camera* camera)
 {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -96,6 +108,9 @@ void processInput(GLFWwindow* window, Camera* camera)
         camera->Sprint(false);
 }
 
+/*
+    MUST be refactored! really ugly!
+*/
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
 
@@ -118,6 +133,8 @@ int main(void)
 
     using namespace spark;
     using namespace sparkutils;
+
+    ResourceManager manager;
 
     GLFWwindow* window;
     /* Initialize the library */
@@ -193,6 +210,8 @@ int main(void)
         robot.getVAO().add_attr<float>(3); //Tangent
         robot.ModelInit();
         */
+
+        manager.importModel("res/model/cube/cube.obj", "cube");
 
         Model cube = sparkutils::importObj("res/model/cube/cube.obj");
         cube.getVAO().add_attr<float>(3); //Position

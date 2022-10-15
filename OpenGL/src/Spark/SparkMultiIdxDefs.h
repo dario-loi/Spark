@@ -12,6 +12,14 @@ namespace spark
 {
 
 	/*
+	Namespace ID (for random number generator initialization)
+
+	Lack of documentation leads to the assumption that this 
+	is default-initialized to a non-trivial value.
+	*/
+	boost::uuids::uuid const spark_UUID; 
+
+	/*
 		SPARK_OBJECT
 	*/
 

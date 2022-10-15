@@ -40,7 +40,7 @@ namespace spark
 		 * Imports a Wavefront .Obj file into a model and registers
 		 * it into the manager's collections.
 		 */
-		void importModel(std::string const& model_path, std::string const& name);
+		void importModel(std::string const& model_path, std::string const& name, SparkVAOLayouts layout_specifier);
 
 		/**
 		 * Loads a glsl shader to be used by Spark.
