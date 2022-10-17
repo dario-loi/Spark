@@ -4,8 +4,7 @@
 #include <iostream>
 #include "GL/glew.h"
 #include <gtx/string_cast.hpp>
-
-constexpr const unsigned int SPARK_MAXIMUM_UBO_SIZE = 128;
+#include "..\..\Spark\SparkConfig.h"
 
 template<typename T>
 class UBO
@@ -14,12 +13,14 @@ private:
 	unsigned int RenderID;
 	std::vector<T> data;
 	unsigned int channel;
-	bool isUpdated;
+	bool isUpdated{false};
 
 public:
 
 
-	explicit UBO(std::vector<T>&& data_in, const unsigned int channel);
+	explicit UBO(std::vector<T>&& data_in, unsigned int channel);
+	explicit UBO(unsigned int channel);
+
 	~UBO();
 	UBO(UBO const&) = delete;
 	UBO& operator=(UBO const&) = delete;
@@ -28,7 +29,7 @@ public:
 	void Bind();
 	void Unbind() const;
 
-	void setData(std::vector<float>&& newArr);
+	void setData(std::vector<T>&& newArr);
 	void emplaceData(T&& element);
 	void emplaceData(T& element);
 	void setSubData(T&& element, size_t indx);
@@ -37,32 +38,29 @@ public:
 
 	void Update();
 
-	unsigned int getRenderID() const { return RenderID; }
-	unsigned int getChannel() const { return channel; }
+	[[nodiscard]] unsigned int getRenderID() const { return RenderID; }
+	[[nodiscard]] unsigned int getChannel() const { return channel; }
 
 #ifdef _DEBUG
-
 	void printContents() const{ 
 		for (auto const& elem : data) 
 		{ 
 			std::cout << glm::to_string(elem) << " "; 
 		} 
 		std::cout << std::endl; }
-
 #endif // _DEBUG
 
 
-	size_t getSize() const { return data.size(); }
+	[[nodiscard]] size_t getSize() const { return data.size(); }
 
 };
 
 template<typename T>
-inline UBO<T>::UBO(std::vector<T>&& data_in, const unsigned int channel) : channel(channel)
+inline UBO<T>::UBO(std::vector<T>&& data_in, const unsigned int channel)
+	: data(std::move(data_in)), channel(channel)
 {
 
 	assert(data_in.size() < SPARK_MAXIMUM_UBO_SIZE);
-	data = std::move(data_in);
-	isUpdated = false;
 
 	glGenBuffers(1, &RenderID);
 	glBindBuffer(GL_UNIFORM_BUFFER, RenderID);
@@ -72,6 +70,22 @@ inline UBO<T>::UBO(std::vector<T>&& data_in, const unsigned int channel) : chann
 		GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
+
+template<typename T>
+inline UBO<T>::UBO(unsigned int channel)
+	: channel(channel)
+{
+	std::vector<T> default_init(SPARK_MAXIMUM_UBO_SIZE);
+
+	glGenBuffers(1, &RenderID);
+	glBindBuffer(GL_UNIFORM_BUFFER, RenderID);
+	glBufferData(GL_UNIFORM_BUFFER,
+		SPARK_MAXIMUM_UBO_SIZE * sizeof(T),
+		default_init.data(), /*Placeholder filler*/
+		GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 
 template<typename T>
 inline UBO<T>::~UBO()
@@ -94,7 +108,7 @@ inline void UBO<T>::Unbind() const
 }
 
 template<typename T>
-inline void UBO<T>::setData(std::vector<float>&& newArr)
+inline void UBO<T>::setData(std::vector<T>&& newArr)
 {
 
 	assert(newArr.size() < SPARK_MAXIMUM_UBO_SIZE);
@@ -147,8 +161,8 @@ inline void UBO<T>::setSubData(T& element, size_t indx)
 template<typename T>
 inline T& UBO<T>::getElementAt(size_t indx)
 {
-	isUpdated = true;
-	return data.at(indx);	//we MUST assume that the data has changed, even if it's not the case.
+	isUpdated = true;		//we MUST assume that the data has changed, even if it's not the case.
+	return data.at(indx);	
 }
 
 template<typename T>

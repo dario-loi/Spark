@@ -26,7 +26,9 @@ namespace spark
 	//boost::multi_index tag
 	struct UniqueID {};
 	//boost::multi_index tag
-	struct ObjectName {};
+	struct ObjectName {}; //add again later
+
+	struct ModelName {};
 
 	using SparkObjContainer = boost::multi_index::multi_index_container< std::shared_ptr<spark::SparkObject>,
 		boost::multi_index::indexed_by<
@@ -35,7 +37,7 @@ namespace spark
 		boost::multi_index::const_mem_fun<spark::SparkObject, const boost::uuids::uuid, &spark::SparkObject::getUUID>
 		>,
 		boost::multi_index::hashed_non_unique<
-		boost::multi_index::tag<ObjectName>,
+		boost::multi_index::tag<ModelName>,
 		boost::multi_index::const_mem_fun<spark::SparkObject, std::string, &spark::SparkObject::getModelName>
 		>
 		>
@@ -46,7 +48,7 @@ namespace spark
 	*/
 
 	//boost::multi_index tag
-	struct ModelName {};
+	
 
 	using SparkModelContainer = boost::multi_index::multi_index_container< std::shared_ptr<spark::Model>,
 		boost::multi_index::indexed_by<

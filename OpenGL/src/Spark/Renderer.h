@@ -8,13 +8,13 @@ namespace spark
 
 	public:
 
-		Renderer(spark::ResourceManager const& resourceManager)
+		explicit Renderer(spark::ResourceManager& resourceManager)
 			: man(resourceManager) {}
 
 		void render();
 
 	private:
 
-		ResourceManager const& man;
+		ResourceManager& man;
 	};
 }

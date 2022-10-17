@@ -3894,6 +3894,9 @@
     <ClCompile Include="res\vendor\boost\libs\timer\src\cpu_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Spark\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\GLData\Shader.h">
@@ -17870,6 +17873,9 @@
     <ClInclude Include="res\vendor\boost\libs\thread\test\timming.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Spark\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Doxyfile" />
@@ -17976,6 +17982,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="res\vendor\boost\libs\thread\index.html" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\Grass.png">

@@ -11,6 +11,7 @@
 
 #include "vec4.hpp"
 
+#include "../GLData/Buffers/UBO.h"
 #include "SparkConfig.h"
 #include "boost/uuid/uuid.hpp"
 #include "boost/uuid/name_generator.hpp"
@@ -24,6 +25,55 @@ namespace spark
 	public:
 
 		ResourceManager();
+
+		[[nodiscard]] spark::SparkObjContainer getObjects() const
+		{
+			return objMap;
+		}
+
+		spark::SparkObjContainer& getObjects()
+		{
+			return objMap;
+		}
+
+
+		[[nodiscard]] spark::SparkTextureContainer getTextures() const
+		{
+			return textures;
+		}
+
+		spark::SparkTextureContainer& getTextures()
+		{
+			return textures;
+		}
+
+		[[nodiscard]] spark::SparkShaderContainer getShaders() const
+		{
+			return shaders;
+		}
+
+		spark::SparkShaderContainer& getShaders() 
+		{
+			return shaders;
+		}
+
+		[[nodiscard]] spark::SparkModelContainer getModels() const
+		{
+			return models;
+		}
+
+		spark::SparkModelContainer& getModels()
+		{
+			return models;
+		}
+
+		auto& getLights() { return lights; }
+		[[nodiscard]] auto getLights() const { return lights; }
+
+		auto& getLightUBO() { return light_positions; }
+
+		auto& getTransparents() { return transparents; }
+		[[nodiscard]] auto getTransparents() const { return transparents; }
 
 		void spawnObject(std::shared_ptr<spark::Model>&& model, glm::vec4 const& position, std::string const& name);
 		void spawnObject(std::string const& model_name, glm::vec4 const& position, std::string const& name);
@@ -52,8 +102,11 @@ namespace spark
 
 	private:
 
+
 		std::vector<std::unique_ptr<spark::SparkObject>> lights;
 		std::vector<std::unique_ptr<spark::SparkObject>> transparents;
+
+		UBO<glm::vec4> light_positions{SPARK_UBO_LIGHT_CHANNEL};
 
 		spark::SparkTextureContainer textures;
 		spark::SparkModelContainer models;

@@ -7,7 +7,7 @@
 #include "gtc/matrix_inverse.hpp"
 
 spark::Instance::Instance(std::shared_ptr<Model> object_model, glm::vec3 position)
-	: objModel(object_model), name(name_), mMatrix(1.0f), nMatrix(1.0f), displacement(1.0f), rotation(1.0f), scaling(1.0f)
+	: objModel(object_model), mMatrix(1.0f), nMatrix(1.0f), displacement(1.0f), rotation(1.0f), scaling(1.0f)
 {
 	trans.vDisplacement.vector = position;
 	trans.vRotation.vector = glm::vec3(0.0f);

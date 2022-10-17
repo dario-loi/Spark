@@ -3,7 +3,10 @@
 #include <cstddef>
 
 #define TO_UINT8(X) static_cast<uint8_t>(X)
-#define SPARK_STANDARD_LAYOUT SparkVAOLayouts::HAS_POSITION | SparkVAOLayouts::HAS_NORMAL | SparkVAOLayouts::HAS_UVS | SparkVAOLayouts::HAS_BITANGENT
+
+constexpr const bool SPARK_STANDARD_LAYOUT{ SparkVAOLayouts::HAS_POSITION | SparkVAOLayouts::HAS_NORMAL | SparkVAOLayouts::HAS_UVS | SparkVAOLayouts::HAS_BITANGENT };
+constexpr const unsigned int SPARK_UBO_LIGHT_CHANNEL{ 1 };
+constexpr const unsigned int SPARK_MAXIMUM_UBO_SIZE{ 128 };
 
 namespace spark
 {
