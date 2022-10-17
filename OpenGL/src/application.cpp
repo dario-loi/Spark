@@ -51,7 +51,7 @@ constexpr const char* glsl_version = "#version 130";
 #ifdef _DEBUG
 #define LOG(x) std::clog<<(x)<<std::endl;
 #else  
-define LOG(x)  
+#define LOG(x)  
 #endif
 
 /**
@@ -248,6 +248,7 @@ int main(void)
         manager.addTexture("res/textures/grass.bmp", "Grass", DIFFUSE_MAP);
         manager.addTexture("res/textures/grass_spec.bmp", "Grass Speculars", SPECULAR_MAP);
         manager.addTexture("res/textures/grass_normal.bmp", "Grass Normals", NORMAL_MAP);
+        manager.addTexture("res/textures/emissive.png", "Emissive without corners", EMISSIVE_MAP);
 
         /*
             Init Shader
