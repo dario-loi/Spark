@@ -5,7 +5,7 @@
 namespace sparkutils
 {
 	
-	class [[deprecated("DEPRECATED: doesn't have sufficient use cases and is superseded by boost::uuid")]] RandomGenerator
+	class RandomGenerator
 	{
 
 	public:
@@ -24,12 +24,12 @@ namespace sparkutils
 			return std::uniform_int_distribution<T>(from, to); 
 		};
 
-		inline auto getGenerator() { return mersenne; };
+		[[nodiscard]] inline auto getEngine() const { return mersenne; };
 
 	private:
-		std::mt19937_64 mersenne;
+		std::mt19937_64 mersenne{};
 		
 	};
 
-	static inline RandomGenerator randGen;
+	static inline const RandomGenerator randGen;
 }
