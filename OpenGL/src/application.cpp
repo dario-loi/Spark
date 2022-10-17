@@ -19,7 +19,6 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-
 constexpr const char* glsl_version = "#version 130";
 
 //STDLIB
@@ -32,6 +31,8 @@ constexpr const char* glsl_version = "#version 130";
 #include <iostream>
 #include <filesystem>
 #include <ctime>
+#include <format>
+#include <ranges>
 
 //Custom OpenGL Data Structures
 #include "GLData/Model.h"
@@ -50,7 +51,7 @@ constexpr const char* glsl_version = "#version 130";
 #ifdef _DEBUG
 #define LOG(x) std::clog<<(x)<<std::endl;
 #else  
-define LOG(x)  
+#define LOG(x)  
 #endif
 
 /**
@@ -211,14 +212,7 @@ int main(void)
         robot.ModelInit();
         */
 
-        manager.importModel("res/model/cube/cube.obj", "cube");
-
-        Model cube = sparkutils::importObj("res/model/cube/cube.obj");
-        cube.getVAO().add_attr<float>(3); //Position
-        cube.getVAO().add_attr<float>(3); //Normal
-        cube.getVAO().add_attr<float>(2); //Texture
-        cube.getVAO().add_attr<float>(3); //Tangent
-        cube.ModelInit();
+        manager.importModel("res/model/cube/cube.obj", "cube", SPARK_STANDARD_LAYOUT);
 
 
         /*
@@ -228,51 +222,41 @@ int main(void)
         //Randomly gen INSTANCES instances
         std::vector<Instance> instances;
 
-        constexpr const unsigned int INSTANCES = 1000;
+        constexpr int INSTANCES = 1000;
 
         instances.reserve(INSTANCES);
 
         {
-            auto model_ptr = std::make_shared<Model>(cube);
-            auto gen = sparkutils::randGen.getGenerator();
-            auto dist = sparkutils::randGen.getRealDistribution(-50.f, 50.f);
-            auto dist_scale = sparkutils::randGen.getRealDistribution(0.75f, 1.25f);
-            auto dist_rot = sparkutils::randGen.getRealDistribution(0.f, 359.9f);
+            auto pos_dist = RandomGenerator::getRealDistribution(-50, 50);
+            auto engine = sparkutils::randGen.getEngine();
 
-            for (int c = 0; c < INSTANCES; ++c)
+            for (auto i : std::views::iota(0, INSTANCES))
             {
-                auto position = glm::vec3(
-                    dist(gen), dist(gen), dist(gen)
-                );
+                glm::vec4 pos{ pos_dist(engine), pos_dist(engine), pos_dist(engine), 1.0F };
 
-                instances.emplace_back(model_ptr, position);
-                instances.at(c).Rotate(glm::vec3(dist_rot(gen), dist_rot(gen), dist_rot(gen)));
-                instances.at(c).Scale(glm::vec3(dist_scale(gen), dist_scale(gen), dist_scale(gen)));
+                manager.spawnObject("cube", pos, std::format("cube{i}", i));
             }
         }
 
-        std::vector<Instance> lights;
-
-        const constexpr unsigned int NUM_LIGHTS = 2;
-
-        for (size_t i = 0; i < NUM_LIGHTS; ++i)
-        {
-            lights.push_back({ std::make_shared<Model>(cube), { 5.0f , -25.0f, 0.0f - (static_cast<float>(i)) * 4.0f } });
-        }
+        /*
+            Create the lights
+        */
 
         /*
             Creating Texture (Temporary workaround for testing, will move this into either Instance or Model depending on design choices)
         */
-        auto robot_tex  = Texture("res/textures/grass.bmp", GL_TEXTURE_2D, GL_SRGB8_ALPHA8);
-        auto robot_spec = Texture("res/textures/grass_spec.bmp", GL_TEXTURE_2D, GL_RGBA8);
-        auto robot_norm = Texture("res/textures/grass_normal.bmp", GL_TEXTURE_2D, GL_RGBA8);
+        manager.addTexture("res/textures/grass.bmp", "Grass", DIFFUSE_MAP);
+        manager.addTexture("res/textures/grass_spec.bmp", "Grass Speculars", SPECULAR_MAP);
+        manager.addTexture("res/textures/grass_normal.bmp", "Grass Normals", NORMAL_MAP);
+        manager.addTexture("res/textures/emissive.png", "Emissive without corners", EMISSIVE_MAP);
 
         /*
             Init Shader
         */
 
-        auto shader = Shader("res/shaders/Phong.shader");
-        auto light_shader = Shader("res/shaders/Light.shader");
+        manager.loadShader("res/shaders/Phong.shader", "Main Lightning Model");
+        manager.loadShader("res/shaders/Light.shader", "Simple Color Shader");
+
         
         shader.Bind();
 
