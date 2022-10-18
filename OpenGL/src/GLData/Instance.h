@@ -3,6 +3,7 @@
 #include "glm.hpp"
 #include <memory>
 #include <string>
+#include <cstdint>
 
 namespace spark
 {
@@ -10,6 +11,13 @@ namespace spark
 	{
 	private: 
 		std::shared_ptr<Model> objModel;
+
+		/* Offset at which this instance's data
+		is contained in the VBO
+		
+		Utilized for memory management during instance rendering
+		calls.*/
+		uint64_t instAddrOffset;
 
 		glm::mat4 mMatrix;
 		glm::mat4 nMatrix;

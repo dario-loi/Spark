@@ -14,32 +14,6 @@ class SparkObject
 {
 public:
 
-	/*
-	Holds together a number of properties
-	that represent the object's material.
-*/
-	struct Material
-	{
-		//Fallback solid color
-		glm::vec4 color{ 1.0F, 1.0F, 1.0F, 1.0F };
-
-	};
-
-	/*
-		Holds a number of properties that represent the object's
-		behaviour as a light emitter
-	*/
-	struct LightProperties
-	{
-		//Light Receiver properties
-		float glossiness = 0.5F;	//Determines specular component intensity, in ]0, 1]
-
-		//Light Transmitter properties
-		float alpha = 0.0F;			//linear attenuation coefficient;
-		float beta = 0.0F;			//quadratic attenuation coefficient;
-
-	};
-
 	SparkObject(const boost::uuids::uuid UUID, std::string const& name,
 		std::shared_ptr<Model> const& instance_model)
 		: UUID{ UUID }, name{ name }, flags{ spark::SparkRenderFlags::NONE }, 

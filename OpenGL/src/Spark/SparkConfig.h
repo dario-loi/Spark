@@ -1,10 +1,10 @@
 #pragma once
 #include <cstdint>
 #include <cstddef>
-
+#include "mat4x4.hpp"
 #define TO_UINT8(X) static_cast<uint8_t>(X)
 
-constexpr const bool SPARK_STANDARD_LAYOUT{ SparkVAOLayouts::HAS_POSITION | SparkVAOLayouts::HAS_NORMAL | SparkVAOLayouts::HAS_UVS | SparkVAOLayouts::HAS_BITANGENT };
+constexpr const bool SPARK_STANDARD_LAYOUT{ spark::SparkVAOLayouts::HAS_POSITION | spark::SparkVAOLayouts::HAS_NORMAL | spark::SparkVAOLayouts::HAS_UVS | spark::SparkVAOLayouts::HAS_BITANGENT };
 constexpr const unsigned int SPARK_UBO_LIGHT_CHANNEL{ 1 };
 constexpr const unsigned int SPARK_MAXIMUM_UBO_SIZE{ 128 };
 
@@ -12,6 +12,55 @@ namespace spark
 {
 	//constants
 	inline constexpr int16_t NUM_LIGHTS = 1024;
+
+	//structs
+
+		/*
+		Holds together a number of properties
+		that represent the object's material.
+	*/
+	struct Material
+	{
+		//Fallback solid color
+		glm::vec4 color{ 1.0F, 1.0F, 1.0F, 1.0F };
+
+		//Light Receiver properties
+		float glossiness = 0.5F;	//Determines specular component intensity, in ]0, 1]
+
+
+	};
+
+	/*
+	
+		Struct to be packed into a VBO
+		to represent a Model's instance's individual
+		attributes.
+
+	*/
+	struct SparkInstanceData
+	{
+		glm::mat4 instanceMatrix;
+		glm::mat4 normalMatrix;
+		Material materialProperties;
+	};
+
+	constexpr size_t const SIZEOF_INSTANCE_DATA = sizeof(SparkInstanceData);
+	constexpr size_t const INITIAL_INSTANCES = 8Ui64;
+
+
+	/*
+		Holds a number of properties that represent the object's
+		behaviour as a light emitter
+	*/
+	struct LightProperties
+	{
+
+		//Light Transmitter properties
+		float alpha = 0.0F;			//linear attenuation coefficient
+		float beta = 0.0F;			//quadratic attenuation coefficient
+
+	};
+
 
 	//enums
 	enum SparkRenderFlags : int8_t

@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "boost/uuid/uuid.hpp"
 
 spark::Model::Model(boost::uuids::uuid UUID_, std::string const& name_, std::vector<float>&& vertices, std::vector<unsigned int>&& indices)
 	: UUID(UUID_), m_Vbo(std::move(vertices)), m_Ebo(std::move(indices)), name(name_)

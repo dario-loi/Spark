@@ -4,6 +4,7 @@
 #include "Buffers/VBO.h"
 #include <string>
 #include <cstdint>
+#include "boost/uuid/uuid.hpp"
 
 namespace spark
 {

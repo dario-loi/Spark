@@ -141,7 +141,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$SolutionDir)OpenGL\src\GLData;$(SolutionDir)OpenGL\res\vendor\boost;$(SolutionDir)OpenGL\res\vendor\imgui;$(SolutionDir)Dependencies\ASSIMP\include;$(SolutionDir)Dependencies\GLM;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\glew-2.1.0\include;$(SolutionDir)OpenGL\res\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -190,7 +190,7 @@ xcopy /y /d "$(SolutionDir)Dependencies\ZLIB\lib\zlib.dll" "$(OutDir)"</Command>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <StringPooling>true</StringPooling>
       <OpenMPSupport>true</OpenMPSupport>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <MinimalRebuild>false</MinimalRebuild>
       <CallingConvention>Cdecl</CallingConvention>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
