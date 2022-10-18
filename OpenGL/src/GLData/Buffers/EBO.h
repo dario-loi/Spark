@@ -9,7 +9,7 @@ private:
 
 public:
 
-	explicit EBO(std::vector<unsigned int>&& indices);
+	explicit EBO(std::vector<unsigned int>&& indices) noexcept;
 	~EBO();
 
 	void Bind() const;

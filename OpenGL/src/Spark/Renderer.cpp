@@ -34,10 +34,10 @@ void spark::Renderer::render()
 			obj_it != obj_end;
 			++obj_it)
 		{
-			auto& object = *obj_it->get();
-			auto mm = object.getInstance().getModelMatrix();
-			auto nm = object.getInstance().getNormalMatrix();
-			auto props = object.getMaterial();
+			auto& object = *(* obj_it);
+			auto& model_matrix = object.getInstance().getModelMatrix();
+			auto& normal_matrix = object.getInstance().getNormalMatrix();
+			auto& properties = object.getMaterial();
 
 			/*
 			* stuff this into VBO

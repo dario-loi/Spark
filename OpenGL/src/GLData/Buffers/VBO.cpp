@@ -12,7 +12,7 @@ VBO::VBO(std::vector<float>&& vertices) noexcept
 	glBindBuffer(GL_ARRAY_BUFFER, RenderID);
 	
 	instanceBaseOffset = std::distance(verts.begin(), verts.end());
-	std::vector<float> dest(verts.size() * sizeof(float) + spark::SIZEOF_INSTANCE_DATA * spark::SIZEOF_INSTANCE_DATA);
+	std::vector<float> dest(verts.size() + spark::INITIAL_INSTANCES * spark::FLOATS_IN_INSTANCE);
 
 	
 	/*
@@ -29,21 +29,22 @@ VBO::VBO(std::vector<float>&& vertices) noexcept
 	/*move instances into vector*/
 	memcpy(std::to_address(dest.begin() + instanceBaseOffset),
 		std::to_address(instances.begin()),
-		verts.size() * sizeof(float)
+		instances.size() * spark::SIZEOF_INSTANCE_DATA
 	);
 
 	glBufferData(GL_ARRAY_BUFFER, 
 		static_cast<GLsizeiptr>(dest.size() * sizeof(float)),
 		dest.data(), GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-VBO::~VBO()
+VBO::~VBO() noexcept
 {
 	glDeleteBuffers(1, &RenderID);
 }
 
-void VBO::Bind() const
+void VBO::Bind() const 
 {
 	glBindBuffer(GL_ARRAY_BUFFER, RenderID);
 }
@@ -56,18 +57,28 @@ void VBO::Unbind() const
 void VBO::setData(std::vector<float>&& newArr)
 {
 	verts = std::move(newArr);
+	this->Bind();
+	glBufferSubData(GL_ARRAY_BUFFER, 0UI64, static_cast<GLintptr>(verts.size()), verts.data());
+	this->Unbind();
 }
 
-void VBO::setInstanceSubData(std::vector<spark::SparkInstanceData>&& data, uint64_t offset)
+void VBO::setInstanceSubData(std::vector<spark::SparkInstanceData> const& data, uint64_t offset) noexcept
 {
+	this->Bind();
 	glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLintptr>(instanceBaseOffset +
 		offset * spark::SIZEOF_INSTANCE_DATA),
 		sizeof(float), (void*)data.data());
+	this->Unbind();
 }
 
-void VBO::setInstanceData(std::vector<spark::SparkInstanceData>&& data)
+void VBO::setInstanceData(std::vector<spark::SparkInstanceData> const& data) noexcept
 {
+	this->Bind();
+	glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLintptr>(instanceBaseOffset * sizeof(float)),
+		static_cast<GLsizeiptr>(data.size()), (void*)data.data());
+	this->Unbind();
 }
+
 
 /* 
 VAO MUST be bound 
@@ -77,19 +88,18 @@ with a new one in case of error
 
 return the index of the inserted instance.
 */
-size_t VBO::addInstance(spark::SparkInstanceData&& inst) noexcept
+size_t VBO::addInstance(spark::SparkInstanceData& inst) noexcept
 {
-	auto const inst_size{ spark::SIZEOF_INSTANCE_DATA };
 
-	instances.emplace_back(std::move(inst));
+	instances.emplace_back(inst);
 	auto curr_indx = instances.size();
-
+	this->Bind();
 	if (instances.size() > instanceCapacity)//Realloc VBO
 	{
 		/*expand by a power of two*/
 		instanceCapacity = static_cast<size_t>(std::exp2(std::ceil(std::log2(instanceCapacity)) + 1.0));
 
-		std::vector<float> dest(verts.size() * sizeof(float) + instanceCapacity * spark::SIZEOF_INSTANCE_DATA);
+		std::vector<float> dest(verts.size() + instanceCapacity * spark::FLOATS_IN_INSTANCE);
 		
 		/*
 		We use memcpy to perform type erasure to
@@ -105,7 +115,7 @@ size_t VBO::addInstance(spark::SparkInstanceData&& inst) noexcept
 		/*move instances into vector*/
 		memcpy(std::to_address(dest.begin() + instanceBaseOffset),
 			std::to_address(instances.begin()),
-			verts.size() * sizeof(float));
+			instances.size() * spark::SIZEOF_INSTANCE_DATA);
 
 
 		glDeleteBuffers(1, &RenderID);
@@ -114,15 +124,24 @@ size_t VBO::addInstance(spark::SparkInstanceData&& inst) noexcept
 
 		glBufferData(GL_ARRAY_BUFFER,
 			static_cast<GLsizeiptr>(verts.size() * sizeof(float) + instanceCapacity * spark::SIZEOF_INSTANCE_DATA),
-			dest.data(), GL_STATIC_DRAW);
+			dest.data(), GL_DYNAMIC_DRAW); 
+
+		/*
 		
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+			The specifier is changed to GL_DYNAMIC_DRAW cause it 
+			is now safe to assume that this Model will be spawned
+			repeatedly.
+		
+		*/
+		
+		
 	}
 	else //Append element to previous storage
 	{
-	glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLintptr>(instanceBaseOffset + 
+	glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLintptr>(instanceBaseOffset * sizeof(float) +
 		curr_indx * spark::SIZEOF_INSTANCE_DATA), 
 		spark::SIZEOF_INSTANCE_DATA, (void*) std::to_address(instances.begin() + curr_indx));
 	}
+	this->Unbind();
 }
 

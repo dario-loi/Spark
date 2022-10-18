@@ -2,7 +2,7 @@
 #include "EBO.h"
 #include "GL/glew.h"
 
-EBO::EBO( std::vector<unsigned int>&& indices)
+EBO::EBO( std::vector<unsigned int>&& indices) noexcept
 	:
 	indx(std::move(indices))
 {

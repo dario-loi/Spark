@@ -4,6 +4,7 @@
 #include "mat4x4.hpp"
 #define TO_UINT8(X) static_cast<uint8_t>(X)
 
+//used to be DEFINEs, so we keep em out of the namespace for convenience (ugh, pollution!)
 constexpr const bool SPARK_STANDARD_LAYOUT{ spark::SparkVAOLayouts::HAS_POSITION | spark::SparkVAOLayouts::HAS_NORMAL | spark::SparkVAOLayouts::HAS_UVS | spark::SparkVAOLayouts::HAS_BITANGENT };
 constexpr const unsigned int SPARK_UBO_LIGHT_CHANNEL{ 1 };
 constexpr const unsigned int SPARK_MAXIMUM_UBO_SIZE{ 128 };
@@ -19,6 +20,8 @@ namespace spark
 		Holds together a number of properties
 		that represent the object's material.
 	*/
+#pragma pack(push, 1)
+#pragma pack(show)
 	struct Material
 	{
 		//Fallback solid color
@@ -29,6 +32,7 @@ namespace spark
 
 
 	};
+#pragma pack(pop)
 
 	/*
 	
@@ -37,21 +41,28 @@ namespace spark
 		attributes.
 
 	*/
+
+#pragma pack(push, 1)
+#pragma pack(show)
 	struct SparkInstanceData
 	{
 		glm::mat4 instanceMatrix;
 		glm::mat4 normalMatrix;
-		Material materialProperties;
+		spark::Material materialProperties;
 	};
+#pragma pack(pop)
 
-	constexpr size_t const SIZEOF_INSTANCE_DATA = sizeof(SparkInstanceData);
-	constexpr size_t const INITIAL_INSTANCES = 8Ui64;
+	constexpr size_t const SIZEOF_INSTANCE_DATA{ sizeof(SparkInstanceData) };
+	constexpr size_t const INITIAL_INSTANCES{ 8UI64 };
+	constexpr size_t const FLOATS_IN_INSTANCE{ SIZEOF_INSTANCE_DATA / sizeof(float) };
 
 
 	/*
 		Holds a number of properties that represent the object's
 		behaviour as a light emitter
 	*/
+#pragma pack(push, 1)
+#pragma pack(show)
 	struct LightProperties
 	{
 
@@ -60,7 +71,7 @@ namespace spark
 		float beta = 0.0F;			//quadratic attenuation coefficient
 
 	};
-
+#pragma pack(pop)
 
 	//enums
 	enum SparkRenderFlags : int8_t
@@ -105,7 +116,6 @@ namespace spark
 		EMISSIVE_MAP	= 0x3
 	};
 
-	/*
 	/*
 	
 	Defining bitwise OR operators for our enums
@@ -183,7 +193,7 @@ namespace spark
 	constexpr SparkVAOLayouts operator~(SparkVAOLayouts val) {
 		return static_cast<SparkVAOLayouts>(~TO_UINT8(val));
 	}
-	*/
+
 }
 
 

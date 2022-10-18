@@ -39,10 +39,10 @@ public:
 
 	[[nodiscard]] constexpr size_t getTotalSize() const { return (instances.size() + verts.size()); }
 
-	void setInstanceSubData(std::vector<spark::SparkInstanceData>&& data, size_t offset) noexcept;
-	void setInstanceData(std::vector<spark::SparkInstanceData>&& data) noexcept;
+	void setInstanceSubData(std::vector<spark::SparkInstanceData> const& data, size_t offset) noexcept;
+	void setInstanceData(std::vector<spark::SparkInstanceData> const& data) noexcept;
 
-	[[nodiscard]] size_t addInstance(spark::SparkInstanceData&& inst) noexcept;
+	[[nodiscard]] size_t addInstance(spark::SparkInstanceData& inst) noexcept;
 
 
 	[[nodiscard]] std::vector<float> const& getData() const { return verts; }
