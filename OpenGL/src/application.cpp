@@ -220,7 +220,6 @@ int main(void)
         */
 
         //Randomly gen INSTANCES instances
-        std::vector<Instance> instances;
 
         constexpr int INSTANCES = 1000;
 
@@ -234,7 +233,7 @@ int main(void)
             {
                 glm::vec4 pos{ pos_dist(engine), pos_dist(engine), pos_dist(engine), 1.0F };
 
-                manager.spawnObject("cube", pos, std::format("cube{i}", i));
+                manager.spawnObject("cube", pos, std::format("cube_{i}", i));
             }
         }
 
@@ -248,7 +247,7 @@ int main(void)
         manager.addTexture("res/textures/grass.bmp", "Grass", DIFFUSE_MAP);
         manager.addTexture("res/textures/grass_spec.bmp", "Grass Speculars", SPECULAR_MAP);
         manager.addTexture("res/textures/grass_normal.bmp", "Grass Normals", NORMAL_MAP);
-        manager.addTexture("res/textures/emissive.png", "Emissive without corners", EMISSIVE_MAP);
+        manager.addTexture("res/textures/emissive.png", "Emissive", EMISSIVE_MAP);
 
         /*
             Init Shader
@@ -257,21 +256,32 @@ int main(void)
         manager.loadShader("res/shaders/Phong.shader", "Main Lightning Model");
         manager.loadShader("res/shaders/Light.shader", "Simple Color Shader");
 
+        manager.setActiveShader("Main Lightning Model");
         
-        shader.Bind();
+
 
         /*
-            Initialize UBOs
+            Initialize Lights
         */
+
+        //odd number
+        constexpr int LIGHTS = 5;
+
+
+        for (auto i : std::views::iota(-INSTANCES/2, INSTANCES/2))
+        {
+            glm::vec4 pos{i * 0.2F, 0.0F, 0.0F, 1.0F };
+
+            manager.spawnObject("cube", pos, std::format("light_{i}", i));
+        }
+
+        /*
         
-        std::vector<glm::vec4> positions(lights.size());
-
-        std::transform(lights.begin(), lights.end(), positions.begin(), [](Instance const& inst) -> glm::vec4 {
-            return glm::vec4(inst.getTransform().vDisplacement.vector, 1.0f);
-            });
-
-        UBO light_positions{std::move(positions), 1};
-        light_positions.Bind();
+            Either:
+                1. Into ResourceManager
+                2, in a separate class (manages it's own UBO)
+        
+        */
 
         using cam_struct = struct {
             glm::mat4 view;

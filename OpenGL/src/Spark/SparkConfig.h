@@ -5,14 +5,20 @@
 #define TO_UINT8(X) static_cast<uint8_t>(X)
 
 //used to be DEFINEs, so we keep em out of the namespace for convenience (ugh, pollution!)
-constexpr const bool SPARK_STANDARD_LAYOUT{ spark::SparkVAOLayouts::HAS_POSITION | spark::SparkVAOLayouts::HAS_NORMAL | spark::SparkVAOLayouts::HAS_UVS | spark::SparkVAOLayouts::HAS_BITANGENT };
+
+//Standard layout used in Spark Shaders for non-instanced objects
+constexpr const uint8_t SPARK_STANDARD_LAYOUT{ spark::SparkVAOLayouts::HAS_POSITION | spark::SparkVAOLayouts::HAS_NORMAL | spark::SparkVAOLayouts::HAS_UVS | spark::SparkVAOLayouts::HAS_BITANGENT };
+//Standard layout used in Spark Shaders for instanced objects
+constexpr const uint8_t SPARK_STANDARD_LAYOUT_INSTANCED{ spark::SparkVAOLayouts::HAS_INST_MODMAT | SPARK_STANDARD_LAYOUT | spark::SparkVAOLayouts::HAS_INST_NORMAT | spark::SparkVAOLayouts::HAS_INST_PROP };
+//Default channel to which the Lights Uniform Buffer Object is bound
 constexpr const unsigned int SPARK_UBO_LIGHT_CHANNEL{ 1 };
+//Maximum Size of an UBO in spark (limits things such as number of lights etc, is completely arbitrary (up to architecture capabilities)).
 constexpr const unsigned int SPARK_MAXIMUM_UBO_SIZE{ 128 };
 
 namespace spark
 {
 	//constants
-	inline constexpr int16_t NUM_LIGHTS = 1024;
+	inline constexpr int16_t NUM_LIGHTS = SPARK_MAXIMUM_UBO_SIZE;
 
 	//structs
 
@@ -74,7 +80,7 @@ namespace spark
 #pragma pack(pop)
 
 	//enums
-	enum SparkRenderFlags : int8_t
+	enum SparkRenderFlags : uint8_t
 	{
 		/**
 		 * Specifies how an object should be treated by the renderer/shader.
@@ -86,7 +92,7 @@ namespace spark
 		HAS_EMISSIVE_MAP	= 0x1 << 3		//SparkObject has an emissive map (and therefore must be a light source).
 	};
 
-	enum SparkVAOLayouts : int8_t
+	enum SparkVAOLayouts : uint8_t
 	{
 		/**
 		 * Specifies different elements that
@@ -101,11 +107,14 @@ namespace spark
 		HAS_NORMAL = 0x1 << 1,
 		HAS_UVS = 0x1 << 2,
 		HAS_BITANGENT = 0x1 << 3,
-		HAS_COLOR = 0x1 << 4
+		HAS_COLOR = 0x1 << 4,
+		HAS_INST_MODMAT = 0x1 << 5,
+		HAS_INST_NORMAT = 0x1 << 6,
+		HAS_INST_PROP = 0x1 << 7
 
 	};
 
-	enum SparkTextureType : int8_t
+	enum SparkTextureType : uint8_t
 	{
 		/**
 		 * Indicates a texture's role.

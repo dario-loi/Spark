@@ -62,7 +62,7 @@ void VBO::setData(std::vector<float>&& newArr)
 	this->Unbind();
 }
 
-void VBO::setInstanceSubData(std::vector<spark::SparkInstanceData> const& data, uint64_t offset) noexcept
+void VBO::setInstanceSubData(std::vector<spark::SparkInstanceData> const& data, size_t offset) const noexcept
 {
 	this->Bind();
 	glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLintptr>(instanceBaseOffset +
@@ -71,7 +71,7 @@ void VBO::setInstanceSubData(std::vector<spark::SparkInstanceData> const& data, 
 	this->Unbind();
 }
 
-void VBO::setInstanceData(std::vector<spark::SparkInstanceData> const& data) noexcept
+void VBO::setInstanceData(std::vector<spark::SparkInstanceData> const& data) const noexcept
 {
 	this->Bind();
 	glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLintptr>(instanceBaseOffset * sizeof(float)),

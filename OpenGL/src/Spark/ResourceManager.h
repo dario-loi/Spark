@@ -67,12 +67,19 @@ namespace spark
 			return models;
 		}
 
+		[[nodiscard]] spark::Shader getShader(std::string const& name) const noexcept
+		{
+			return **shaders.get<ShaderName>().find(name);
+		}
+
 		auto& getLights() { return lights; }
 		[[nodiscard]] auto getLights() const { return lights; }
 
 		auto& getLightUBO() { return light_positions; }
 
 		auto& getTransparents() { return transparents; }
+		void sortTransparents();
+
 		[[nodiscard]] auto getTransparents() const { return transparents; }
 
 		void spawnObject(std::shared_ptr<spark::Model>&& model, glm::vec4 const& position, std::string const& name);
@@ -96,9 +103,10 @@ namespace spark
 		 * Loads a glsl shader to be used by Spark.
 		 */
 		void loadShader(std::string const& shader_path, std::string const& name);
+		void setActiveShader(std::string const& name) const noexcept;
 
 
-		void addTexture(std::string const& model_path, std::string const& name, SparkTextureType texType);
+		void addTexture(std::string const& texture_path, std::string const& name, SparkTextureType texType);
 
 	private:
 

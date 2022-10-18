@@ -93,6 +93,12 @@ namespace spark
 
 	}
 
+	void ResourceManager::setActiveShader(std::string const& name) const noexcept
+	{
+		auto const& res = *shaders.get<ShaderName>().find(name);
+		res->Bind();
+	}
+
 	void ResourceManager::addTexture(std::string const& texture_path, std::string const& name, SparkTextureType texType)
 	{
 		GLenum internalEncoding;

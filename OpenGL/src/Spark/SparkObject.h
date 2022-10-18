@@ -28,9 +28,9 @@ namespace spark
 
 		[[nodiscard]] const boost::uuids::uuid getUUID() const { return UUID; }
 		[[nodiscard]] std::string getModelName() const { return instance.getModelName(); }
-		[[nodiscard]] Instance& getInstance() { return instance; }
+		Instance& getInstance() { return instance; }
 		[[nodiscard]] Instance getInstance() const { return instance; }
-		[[nodiscard]] Material& getMaterial() { return mat; }
+		Material& getMaterial() { return mat; }
 		[[nodiscard]] Material getMaterial() const { return mat; }
 	
 

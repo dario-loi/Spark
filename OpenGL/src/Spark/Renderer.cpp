@@ -4,6 +4,7 @@ void spark::Renderer::render()
 {
 	using ptrToObjs = std::shared_ptr<spark::SparkObject>;
 
+
 	/*
 		Update Uniform Buffer Object to contain
 		the positions of the lights.
@@ -11,8 +12,10 @@ void spark::Renderer::render()
 	auto const& lights = man.getLights();
 	std::vector<glm::vec4> positions(lights.size());
 
+
+
 	std::transform(lights.begin(), lights.end(), positions.begin(), [](ptrToObjs const& objsPtr) -> glm::vec4 {
-		return { (*objsPtr.get()).getInstance().getTransform().vDisplacement.vector, 1.0f };
+		return { (*objsPtr.get()).getInstance().getTransform().vDisplacement.vector, 1.0F };
 		});
 
 	
@@ -21,38 +24,41 @@ void spark::Renderer::render()
 	auto const& models = man.getModels();
 	auto& objects = man.getObjects();
 
-	for (auto const mod : models)
+	for (auto const& mod : models)
 	{
 		//Instance Rendering for each model
-		Model& model = *mod.get();
+		Model const& model = *mod;
+		model.Bind();
 
 		/*
 			Loop objects with the same model and prepare their VBOs by
 			updating their instance data
 		*/
-		for (auto [obj_it, obj_end] = objects.get<ModelName>().equal_range(model.getName());
-			obj_it != obj_end;
-			++obj_it)
+		auto [obj_it, obj_end] = objects.get<ModelName>().equal_range(model.getName());
+		std::vector<spark::SparkInstanceData> buffer(std::distance(obj_end, obj_it));
+
+		for (;obj_it != obj_end;++obj_it)
 		{
 			auto& object = *(* obj_it);
-			auto& model_matrix = object.getInstance().getModelMatrix();
-			auto& normal_matrix = object.getInstance().getNormalMatrix();
-			auto& properties = object.getMaterial();
 
-			/*
-			* stuff this into VBO
-			*/
+			buffer.emplace_back(
+				object.getInstance().getModelMatrix(), 
+				object.getInstance().getNormalMatrix(), 
+				object.getMaterial());
 			
 		}
 
-		/*
-			Send an GlDrawArraysInstanced call
-		*/
+		model.getVBO().setInstanceData(buffer);
+
+		glDrawElementsInstanced(GL_TRIANGLES, (GLsizei)model.getIndexSize(),
+			GL_UNSIGNED_INT, nullptr, model.getVBO().getInstSize());
 
 	}
+	
+	/*
+	
+		Draw transparents
 
-	/* 
-		Draw objects with transparencies
 	*/
 
 }
