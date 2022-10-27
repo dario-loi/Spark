@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "SparkMultiIdxDefs.h"
 
 #include <vector>
@@ -67,9 +65,9 @@ namespace spark
 			return models;
 		}
 
-		[[nodiscard]] spark::Shader getShader(std::string const& name) const noexcept
+		[[nodiscard]] std::shared_ptr<spark::Shader> getShader(std::string const& name) const noexcept
 		{
-			return **shaders.get<ShaderName>().find(name);
+			return *shaders.get<ShaderName>().find(name);
 		}
 
 		auto& getLights() { return lights; }

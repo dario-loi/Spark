@@ -1,33 +1,46 @@
 #pragma once
 #include <vector>
 #include "GL/glew.h"
+#include "mat4x4.hpp"
 
 class VAO
 {
 private:
 	
-	unsigned int RenderID;
-	unsigned int stride;
+	unsigned int RenderID{0UI32};
+	unsigned int stride{ 0UI32 };
+	unsigned int i_stride{ 0UI32 };
 
-	struct attribute {
+	struct Attribute {
 
-		unsigned int size;
-		unsigned int count;
+		int size{ 0I32 };
+		int count{ 0I32 };
 		GLenum type;
 
-		attribute(unsigned int size, unsigned int count, GLenum type)
-			: size(size), count(count), type(type) { }
 	};
 
-	std::vector<attribute> attributes;
+	std::vector<Attribute> attributes;
+	std::vector<Attribute> instance_attr;
 	
 public:
 
 	template<typename TYPE_NOT_SPECIFIED>
-	void add_attr(unsigned int const) = delete; //If we had reflection, I wouldn't be doing this :)
+	void add_attr(int const) = delete; //If we had reflection, I wouldn't be doing this :)
 
 	template<>
-	void add_attr<float>(unsigned int const count);
+	void add_attr<float>(int const count);
+
+	template<>
+	void add_attr<glm::mat4>(int const count);
+
+	template<typename TYPE_NOT_SPECIFIED>
+	void add_attr_inst(int const count) = delete;
+
+	template<>
+	void add_attr_inst<float>(int const count);
+
+	template<>
+	void add_attr_inst<glm::mat4>(int const count);
 
 	void init_VAO() const;
 

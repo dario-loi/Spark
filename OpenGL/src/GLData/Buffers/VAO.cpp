@@ -1,7 +1,6 @@
 #include "VAO.h"
 
 VAO::VAO()
-	: RenderID{0ui32}, stride{0ui64}
 {
 	glGenVertexArrays(1, &RenderID);
 	Bind();
@@ -32,22 +31,67 @@ void VAO::Unbind() const
 }
 
 template<>
-void VAO::add_attr<float>(unsigned int count)
+void VAO::add_attr<float>(int const count)
 {
 	attributes.emplace_back(count * sizeof(float), count, GL_FLOAT);
 	stride += count * sizeof(float);
 }
 
+template<>
+void VAO::add_attr_inst<float>(int const count)
+{
+	instance_attr.emplace_back(count * sizeof(float), count, GL_FLOAT);
+	stride += count * sizeof(float);
+}
+
+template<>
+void VAO::add_attr<glm::mat4>(int const count)
+{
+	attributes.emplace_back(count * sizeof(float), count, GL_FLOAT);
+	stride += count * sizeof(float);
+}
+
+template<>
+void VAO::add_attr_inst<glm::mat4>(int const count)
+{
+	for (int i = 0; i < 4 * count; ++i)
+	{
+		instance_attr.emplace_back(4 * sizeof(float), 4, GL_FLOAT);
+	}
+	
+	i_stride += count * 16 * sizeof(float);
+}
+
+template<>
+void VAO::add_attr<glm::mat4>(int const count)
+{
+	for (int i = 0; i < 4 * count; ++i)
+	{
+		attributes.emplace_back(4 * sizeof(float), 4, GL_FLOAT);
+	}
+
+	stride += count * 16 * sizeof(float);
+}
+
 void VAO::init_VAO() const
 {
-	GLuint c = 0u;
-	GLuint offset = 0u;
+	GLuint c = 0U;
+	GLuint offset = 0U;
+	GLuint i_offset = 0U;
 	Bind();
 
-	for (const attribute& attr : attributes)
+	for (auto const& attr : attributes)
 	{
-		glVertexAttribPointer(c, attr.count, attr.type, GL_FALSE, stride, (void*) offset);	//cast to (void*) is an ugly relic of the past.
+		glVertexAttribPointer(c, attr.count, attr.type, GL_FALSE, stride, reinterpret_cast<void*>(offset));	//cast to (void*) is an ugly relic of the past.
 		offset += attr.size;
+		glEnableVertexAttribArray(c++);
+	}
+
+	for (auto const& i_attr : instance_attr)
+	{
+		
+		glVertexAttribPointer(c, i_attr.count, i_attr.type, GL_FALSE, i_stride, reinterpret_cast<void*>(i_offset));
+		i_offset += i_attr.size;
 		glEnableVertexAttribArray(c++);
 	}
 	

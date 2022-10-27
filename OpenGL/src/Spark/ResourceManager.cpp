@@ -60,19 +60,19 @@ namespace spark
 		
 		assert(layout_specifier == SparkVAOLayouts::NONE && "Layout of model cannot be None");
 
-		if (layout_specifier & SparkVAOLayouts::HAS_POSITION)
+		if (layout_specifier & SparkVAOLayouts::HAS_POSITION) //layout 0
 		{
 			mod.getVAO().add_attr<float>(3);
 		}
-		if (layout_specifier & SparkVAOLayouts::HAS_NORMAL)
+		if (layout_specifier & SparkVAOLayouts::HAS_NORMAL) //layout 1
 		{
 			mod.getVAO().add_attr<float>(3);
 		}
-		if (layout_specifier & SparkVAOLayouts::HAS_UVS)
+		if (layout_specifier & SparkVAOLayouts::HAS_UVS) //layout 2
 		{
 			mod.getVAO().add_attr<float>(2);
 		}
-		if (layout_specifier & SparkVAOLayouts::HAS_BITANGENT)
+		if (layout_specifier & SparkVAOLayouts::HAS_BITANGENT) //layout 3
 		{
 			mod.getVAO().add_attr<float>(3);
 		}
@@ -80,7 +80,20 @@ namespace spark
 		{
 			mod.getVAO().add_attr<float>(4);
 		}
-			
+		if (layout_specifier & SparkVAOLayouts::HAS_INST_MODMAT) //layout 4,5,6,7
+		{
+			mod.getVAO().add_attr_inst<glm::mat4>(1);
+		}
+		if (layout_specifier & SparkVAOLayouts::HAS_INST_NORMAT) //layout 8,9,10,11
+		{
+			mod.getVAO().add_attr_inst<glm::mat4>(1);
+		}
+		if (layout_specifier & SparkVAOLayouts::HAS_INST_PROP) //layout 12, 13
+		{
+			mod.getVAO().add_attr_inst<float>(4);
+			mod.getVAO().add_attr_inst<float>(4);
+		}
+
 
 		mod.ModelInit();
 		models.emplace(std::move(mod));
@@ -97,6 +110,7 @@ namespace spark
 	{
 		auto const& res = *shaders.get<ShaderName>().find(name);
 		res->Bind();
+		
 	}
 
 	void ResourceManager::addTexture(std::string const& texture_path, std::string const& name, SparkTextureType texType)

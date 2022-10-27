@@ -12,13 +12,10 @@ void spark::Renderer::render()
 	auto const& lights = man.getLights();
 	std::vector<glm::vec4> positions(lights.size());
 
-
-
 	std::transform(lights.begin(), lights.end(), positions.begin(), [](ptrToObjs const& objsPtr) -> glm::vec4 {
 		return { (*objsPtr.get()).getInstance().getTransform().vDisplacement.vector, 1.0F };
 		});
 
-	
 	man.getLightUBO().setData(std::move(positions));
 
 	auto const& models = man.getModels();

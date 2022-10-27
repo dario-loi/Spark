@@ -1,17 +1,16 @@
 
 //OpenGL Libs
+#include <winsdkver.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_MESSAGES
-#define GLM_FORCE_ALIGNED_GENTYPES
-#define GLM_FORCE_INTRINSICS 
 #define GLM_PRECISION_MEDIUMP_FLOAT
 #define GLM_PRECISION_MEDIUMP_INT
 #define GLM_PRECISION_MEDIUMP_DOUBLE
 #define GLM_PRECISION_MEDIUMP_UINT
-#include <glm.hpp>
 
+#include <glm.hpp>
 #include <vec3.hpp>
 
 //ImGUI
@@ -47,6 +46,7 @@ constexpr const char* glsl_version = "#version 130";
 
 //ResourceManager and Renderer
 #include "Spark/ResourceManager.h"
+#include "Spark/Renderer.h"
 
 #ifdef _DEBUG
 #define LOG(x) std::clog<<(x)<<std::endl;
@@ -136,6 +136,7 @@ int main(void)
     using namespace sparkutils;
 
     ResourceManager manager;
+    Renderer renderer{ manager };
 
     GLFWwindow* window;
     /* Initialize the library */
@@ -202,24 +203,16 @@ int main(void)
     glDebugMessageCallback(MessageCallback, nullptr);
 
     {
-        /*
-        Model robot = importObj("res/model/robot/source/robot.obj");
-            
-        robot.getVAO().add_attr<float>(3); //Position
-        robot.getVAO().add_attr<float>(3); //Normal
-        robot.getVAO().add_attr<float>(2); //Texture
-        robot.getVAO().add_attr<float>(3); //Tangent
-        robot.ModelInit();
-        */
 
-        manager.importModel("res/model/cube/cube.obj", "cube", SPARK_STANDARD_LAYOUT);
-
+        manager.importModel("res/model/cube/cube.obj", "cube", SPARK_STANDARD_LAYOUT_INSTANCED);
+        
 
         /*
             Create Instances
         */
 
         //Randomly gen INSTANCES instances
+        std::vector<Instance> instances;
 
         constexpr int INSTANCES = 1000;
 
@@ -233,7 +226,7 @@ int main(void)
             {
                 glm::vec4 pos{ pos_dist(engine), pos_dist(engine), pos_dist(engine), 1.0F };
 
-                manager.spawnObject("cube", pos, std::format("cube_{i}", i));
+                manager.spawnObject("cube", pos, std::format("cube{i}", i));
             }
         }
 
@@ -247,40 +240,20 @@ int main(void)
         manager.addTexture("res/textures/grass.bmp", "Grass", DIFFUSE_MAP);
         manager.addTexture("res/textures/grass_spec.bmp", "Grass Speculars", SPECULAR_MAP);
         manager.addTexture("res/textures/grass_normal.bmp", "Grass Normals", NORMAL_MAP);
-        manager.addTexture("res/textures/emissive.png", "Emissive", EMISSIVE_MAP);
+        manager.addTexture("res/textures/emissive.png", "Emissive without corners", EMISSIVE_MAP);
+
+
+
+        manager.loadShader("res/shaders/Phong.shader", "Main Lightning Model");
+        //tentative initialization outside of the manager
+        auto phong{ manager.getShader("Main Lightning Model") };
+        phong->SetUniform1i("nLights", SPARK_MAXIMUM_UBO_SIZE);
+
+
+        manager.loadShader("res/shaders/Light.shader", "Simple Color Shader");
 
         /*
             Init Shader
-        */
-
-        manager.loadShader("res/shaders/Phong.shader", "Main Lightning Model");
-        manager.loadShader("res/shaders/Light.shader", "Simple Color Shader");
-
-        manager.setActiveShader("Main Lightning Model");
-        
-
-
-        /*
-            Initialize Lights
-        */
-
-        //odd number
-        constexpr int LIGHTS = 5;
-
-
-        for (auto i : std::views::iota(-INSTANCES/2, INSTANCES/2))
-        {
-            glm::vec4 pos{i * 0.2F, 0.0F, 0.0F, 1.0F };
-
-            manager.spawnObject("cube", pos, std::format("light_{i}", i));
-        }
-
-        /*
-        
-            Either:
-                1. Into ResourceManager
-                2, in a separate class (manages it's own UBO)
-        
         */
 
         using cam_struct = struct {
@@ -292,7 +265,7 @@ int main(void)
         std::vector<cam_struct> cam_mat{ {cam.getView(1.0f), cam.getProj(), cam.getPos()} };
         UBO camera_data{ std::move(cam_mat), 2 };
         camera_data.Bind();
-        
+
         std::cout << sizeof(glm::mat3);
 
         /* Loop until the user closes the window */
@@ -300,8 +273,6 @@ int main(void)
         float lastFrame = 0.0f;
         float thisFrame;
 
-        shader.SetUniform1ui("nLights", NUM_LIGHTS);
-        shader.Unbind();
 
         // Our state
         bool show_demo_window = true;
@@ -310,7 +281,6 @@ int main(void)
 
         while (!glfwWindowShouldClose(window))
         {
-            
             thisFrame = static_cast<float>(glfwGetTime());
             float deltaTime = thisFrame - lastFrame;
             lastFrame = thisFrame;
@@ -319,85 +289,15 @@ int main(void)
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            size_t inst_indx = 0;
-
-            /* Render here */
-
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-
-
-            // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-            {
-                static float f = 0.0f;
-                static int counter = 0;
-
-                ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-                ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-                ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-                ImGui::SameLine();
-                ImGui::Text("counter = %d", counter);
-
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-                ImGui::End();
-            }
-
-
-            light_shader.Bind();
 
             camera_data.getElementAt(0).view = cam.getView(deltaTime);
             camera_data.getElementAt(0).pos = cam.getPos();
             camera_data.Update();
 
-            for (size_t indx = 0; auto& light : lights)
-            {
-
-                light.getModel()->Bind();
-
-                light_shader.setUniform4mat("u_mMatrix", light.getModelMatrix());
-
-               /* light.Move(
-                    glm::vec3(
-                        0.01f + (0.02f * ((int) indx - 1)), 0.0f, 0.0f
-                    )
-                );*/
-
-                light_positions.Bind();
-                light_positions.setSubData(glm::vec4(light.getTransform().vDisplacement.vector, 1.0f), indx++);
-                
-                light.Draw();
-                light.getModel()->Unbind();
-            }
-
-            light_positions.Update();
-            light_shader.Unbind();
-
-            shader.Bind();
-
-            instances[0].getModel()->Bind();
-            robot_tex.Bind(0);
-            robot_spec.Bind(1);
-            robot_norm.Bind(2);
-
-            shader.SetUniform1i("u_Texture", 0);
-            shader.SetUniform1i("u_Specular", 1);
-            shader.SetUniform1i("u_NormalMap", 2);
-
-            for (auto& inst : instances)
-            {
-
-                shader.setUniform4mat("u_normalMatrix", inst.getNormalMatrix());
-                shader.setUniform4mat("u_mMatrix", inst.getModelMatrix());
-                
-                inst.Rotate({ 0.0f, 0.1f, 0.0f });
-                inst.Draw();
-
-                ++inst_indx;
-            }
-            instances[0].getModel()->Unbind();
-            shader.Unbind();
+            renderer.render();
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -410,11 +310,8 @@ int main(void)
                 /* Poll for and process events */
                 glfwPollEvents();
             }
-
-            
         }
 
-    }
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

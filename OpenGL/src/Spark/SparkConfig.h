@@ -7,9 +7,9 @@
 //used to be DEFINEs, so we keep em out of the namespace for convenience (ugh, pollution!)
 
 //Standard layout used in Spark Shaders for non-instanced objects
-constexpr const uint8_t SPARK_STANDARD_LAYOUT{ spark::SparkVAOLayouts::HAS_POSITION | spark::SparkVAOLayouts::HAS_NORMAL | spark::SparkVAOLayouts::HAS_UVS | spark::SparkVAOLayouts::HAS_BITANGENT };
+constexpr const uint16_t SPARK_STANDARD_LAYOUT{ spark::SparkVAOLayouts::HAS_POSITION | spark::SparkVAOLayouts::HAS_NORMAL | spark::SparkVAOLayouts::HAS_UVS | spark::SparkVAOLayouts::HAS_BITANGENT };
 //Standard layout used in Spark Shaders for instanced objects
-constexpr const uint8_t SPARK_STANDARD_LAYOUT_INSTANCED{ spark::SparkVAOLayouts::HAS_INST_MODMAT | SPARK_STANDARD_LAYOUT | spark::SparkVAOLayouts::HAS_INST_NORMAT | spark::SparkVAOLayouts::HAS_INST_PROP };
+constexpr const uint16_t SPARK_STANDARD_LAYOUT_INSTANCED{ spark::SparkVAOLayouts::HAS_INST_MODMAT | SPARK_STANDARD_LAYOUT | spark::SparkVAOLayouts::HAS_INST_NORMAT | spark::SparkVAOLayouts::HAS_INST_PROP };
 //Default channel to which the Lights Uniform Buffer Object is bound
 constexpr const unsigned int SPARK_UBO_LIGHT_CHANNEL{ 1 };
 //Maximum Size of an UBO in spark (limits things such as number of lights etc, is completely arbitrary (up to architecture capabilities)).
@@ -26,7 +26,7 @@ namespace spark
 		Holds together a number of properties
 		that represent the object's material.
 	*/
-#pragma pack(push, 1)
+#pragma pack(push, 8)
 #pragma pack(show)
 	struct Material
 	{
@@ -48,7 +48,7 @@ namespace spark
 
 	*/
 
-#pragma pack(push, 1)
+#pragma pack(push, 8)
 #pragma pack(show)
 	struct SparkInstanceData
 	{
@@ -62,6 +62,8 @@ namespace spark
 	constexpr size_t const INITIAL_INSTANCES{ 8UI64 };
 	constexpr size_t const FLOATS_IN_INSTANCE{ SIZEOF_INSTANCE_DATA / sizeof(float) };
 
+	constexpr size_t const SIZEOF_MATERIAL{ sizeof(spark::Material) };
+	constexpr size_t const FLOATS_IN_MATERIAL{ SIZEOF_MATERIAL / sizeof(float) };
 
 	/*
 		Holds a number of properties that represent the object's
@@ -80,7 +82,7 @@ namespace spark
 #pragma pack(pop)
 
 	//enums
-	enum SparkRenderFlags : uint8_t
+	enum SparkRenderFlags : uint16_t
 	{
 		/**
 		 * Specifies how an object should be treated by the renderer/shader.
@@ -92,7 +94,7 @@ namespace spark
 		HAS_EMISSIVE_MAP	= 0x1 << 3		//SparkObject has an emissive map (and therefore must be a light source).
 	};
 
-	enum SparkVAOLayouts : uint8_t
+	enum SparkVAOLayouts : uint16_t
 	{
 		/**
 		 * Specifies different elements that
